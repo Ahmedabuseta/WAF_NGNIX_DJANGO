@@ -26,7 +26,7 @@
     
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Total Sites -->
-        <div class="bg-white border border-cf-200 rounded-lg shadow-cf hover:shadow-cf-md transition-shadow duration-200">
+        <div class="bg-white dark:bg-cf-800 border border-cf-200 dark:border-cf-700 rounded-lg shadow-cf hover:shadow-cf-md transition-all duration-200">
             <div class="p-6">
                 <div class="flex items-center">
                     <div class="p-3 rounded-full bg-secondary-100 mr-4">
@@ -41,7 +41,7 @@
         </div>
 
         <!-- Today's Requests -->
-        <div class="bg-white border border-cf-200 rounded-lg shadow-cf hover:shadow-cf-md transition-shadow duration-200">
+        <div class="bg-white dark:bg-cf-800 border border-cf-200 dark:border-cf-700 rounded-lg shadow-cf hover:shadow-cf-md transition-all duration-200">
             <div class="p-6">
                 <div class="flex items-center">
                     <div class="p-3 rounded-full bg-green-100 mr-4">
@@ -56,7 +56,7 @@
         </div>
 
         <!-- Blocked Attacks -->
-        <div class="bg-white border border-cf-200 rounded-lg shadow-cf hover:shadow-cf-md transition-shadow duration-200">
+        <div class="bg-white dark:bg-cf-800 border border-cf-200 dark:border-cf-700 rounded-lg shadow-cf hover:shadow-cf-md transition-all duration-200">
             <div class="p-6">
                 <div class="flex items-center">
                     <div class="p-3 rounded-full bg-primary-100 mr-4">
@@ -88,7 +88,7 @@
     {% if sites %}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {% for site in sites %}
-                <div class="bg-white border border-cf-200 rounded-lg shadow-cf hover:shadow-cf-md transition-shadow duration-200">
+                <div class="bg-white dark:bg-cf-800 border border-cf-200 dark:border-cf-700 rounded-lg shadow-cf hover:shadow-cf-md transition-all duration-200">
                     <div class="p-6">
                         <div class="flex items-start justify-between mb-4">
                             <div class="flex-1">
@@ -119,7 +119,7 @@
             {% endfor %}
         </div>
     {% else %}
-        <div class="bg-white border border-cf-200 rounded-lg shadow-cf">
+        <div class="bg-white dark:bg-cf-800 border border-cf-200 dark:border-cf-700 rounded-lg shadow-cf transition-colors duration-200">
             <div class="p-12 text-center">
                 <i class="fas fa-globe text-cf-300 text-5xl mb-4"></i>
                 <h4 class="text-lg font-medium text-cf-900 mb-2">No Sites Protected Yet</h4>
@@ -136,9 +136,9 @@
 <!-- Analytics Charts Section -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
     <!-- Traffic Analytics Chart -->
-    <div class="bg-white border border-cf-200 rounded-lg shadow-cf">
-        <div class="px-6 py-4 border-b border-cf-200">
-            <h3 class="text-lg font-medium text-cf-900 flex items-center">
+    <div class="bg-white dark:bg-cf-800 border border-cf-200 dark:border-cf-700 rounded-lg shadow-cf transition-colors duration-200">
+        <div class="px-6 py-4 border-b border-cf-200 dark:border-cf-700">
+            <h3 class="text-lg font-medium text-cf-900 dark:text-white flex items-center">
                 <i class="fas fa-chart-line mr-3 text-blue-600"></i>
                 Traffic Analytics
             </h3>
@@ -150,9 +150,9 @@
     </div>
 
     <!-- Security Events Chart -->
-    <div class="bg-white border border-cf-200 rounded-lg shadow-cf">
-        <div class="px-6 py-4 border-b border-cf-200">
-            <h3 class="text-lg font-medium text-cf-900 flex items-center">
+    <div class="bg-white dark:bg-cf-800 border border-cf-200 dark:border-cf-700 rounded-lg shadow-cf transition-colors duration-200">
+        <div class="px-6 py-4 border-b border-cf-200 dark:border-cf-700">
+            <h3 class="text-lg font-medium text-cf-900 dark:text-white flex items-center">
                 <i class="fas fa-shield-alt mr-3 text-red-600"></i>
                 Security Events
             </h3>
@@ -165,7 +165,7 @@
 </div>
 
 <!-- Regional Traffic Map -->
-<div class="bg-white border border-cf-200 rounded-lg shadow-cf mb-8">
+<div class="bg-white dark:bg-cf-800 border border-cf-200 dark:border-cf-700 rounded-lg shadow-cf mb-8 transition-colors duration-200">
     <div class="px-6 py-4 border-b border-cf-200">
         <h3 class="text-lg font-medium text-cf-900 flex items-center">
             <i class="fas fa-globe-americas mr-3 text-green-600"></i>
@@ -209,7 +209,7 @@
     </div>
     
     {% if recent_logs %}
-        <div class="bg-white border border-cf-200 rounded-lg shadow-cf">
+        <div class="bg-white dark:bg-cf-800 border border-cf-200 dark:border-cf-700 rounded-lg shadow-cf transition-colors duration-200">
             <div class="divide-y divide-cf-200">
                 {% for log in recent_logs|slice:":5" %}
                     <div class="p-4 hover:bg-cf-50 transition-colors duration-200">
@@ -240,7 +240,7 @@
             </div>
         </div>
     {% else %}
-        <div class="bg-white border border-cf-200 rounded-lg shadow-cf">
+        <div class="bg-white dark:bg-cf-800 border border-cf-200 dark:border-cf-700 rounded-lg shadow-cf transition-colors duration-200">
             <div class="p-12 text-center">
                 <i class="fas fa-history text-cf-300 text-5xl mb-4"></i>
                 <h4 class="text-lg font-medium text-cf-900 mb-2">No Recent Activity</h4>
@@ -254,9 +254,9 @@
 {% block modals %}
 <!-- Add Site Modal -->
 <div id="addSiteModal" class="modal-backdrop fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white rounded-lg shadow-cf-xl w-full max-w-md mx-4">
-        <div class="flex items-center justify-between p-6 border-b border-cf-200">
-            <h3 class="text-lg font-semibold text-cf-900">Add New Site</h3>
+    <div class="bg-white dark:bg-cf-800 rounded-lg shadow-cf-xl w-full max-w-md mx-4 transition-colors duration-200">
+        <div class="flex items-center justify-between p-6 border-b border-cf-200 dark:border-cf-700">
+            <h3 class="text-lg font-semibold text-cf-900 dark:text-white">Add New Site</h3>
             <button onclick="closeModal('addSiteModal')" class="text-cf-400 hover:text-cf-600">
                 <i class="fas fa-times w-5 h-5"></i>
             </button>
@@ -285,9 +285,9 @@
 
 <!-- Settings Modal -->
 <div id="settingsModal" class="modal-backdrop fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white rounded-lg shadow-cf-xl w-full max-w-lg mx-4">
-        <div class="flex items-center justify-between p-6 border-b border-cf-200">
-            <h3 class="text-lg font-semibold text-cf-900">Quick Settings</h3>
+    <div class="bg-white dark:bg-cf-800 rounded-lg shadow-cf-xl w-full max-w-lg mx-4 transition-colors duration-200">
+        <div class="flex items-center justify-between p-6 border-b border-cf-200 dark:border-cf-700">
+            <h3 class="text-lg font-semibold text-cf-900 dark:text-white">Quick Settings</h3>
             <button onclick="closeModal('settingsModal')" class="text-cf-400 hover:text-cf-600">
                 <i class="fas fa-times w-5 h-5"></i>
             </button>

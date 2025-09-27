@@ -24,7 +24,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Profile Card -->
         <div class="lg:col-span-1">
-            <div class="bg-white shadow-cf rounded-lg border border-cf-200 overflow-hidden">
+            <div class="bg-white dark:bg-cf-800 shadow-cf rounded-lg border border-cf-200 dark:border-cf-700 overflow-hidden transition-colors duration-200">
                 <div class="px-6 py-8 text-center bg-gradient-to-br from-primary-50 to-secondary-50">
                     <div class="mb-4">
                         <div class="w-24 h-24 bg-gradient-to-br from-primary-500 to-secondary-600 rounded-full flex items-center justify-center text-white font-bold text-2xl mx-auto shadow-cf-lg">
@@ -84,7 +84,7 @@
         <!-- Main Content -->
         <div class="lg:col-span-2 space-y-8">
             <!-- Account Information -->
-            <div class="bg-white shadow-cf rounded-lg border border-cf-200">
+            <div class="bg-white dark:bg-cf-800 shadow-cf rounded-lg border border-cf-200 dark:border-cf-700 transition-colors duration-200">
                 <div class="px-6 py-4 border-b border-cf-200">
                     <h3 class="text-lg font-medium text-cf-900 flex items-center">
                         <i class="fas fa-id-card mr-3 text-primary-600"></i>
@@ -135,7 +135,7 @@
 
             {% if user.user_type == 'customer' %}
             <!-- Sites Overview -->
-            <div class="bg-white shadow-cf rounded-lg border border-cf-200">
+            <div class="bg-white dark:bg-cf-800 shadow-cf rounded-lg border border-cf-200 dark:border-cf-700 transition-colors duration-200">
                 <div class="px-6 py-4 border-b border-cf-200 flex items-center justify-between">
                     <h3 class="text-lg font-medium text-cf-900 flex items-center">
                         <i class="fas fa-globe mr-3 text-secondary-600"></i>
@@ -190,7 +190,7 @@
             {% endif %}
 
             <!-- Recent Activity -->
-            <div class="bg-white shadow-cf rounded-lg border border-cf-200">
+            <div class="bg-white dark:bg-cf-800 shadow-cf rounded-lg border border-cf-200 dark:border-cf-700 transition-colors duration-200">
                 <div class="px-6 py-4 border-b border-cf-200">
                     <h3 class="text-lg font-medium text-cf-900 flex items-center">
                         <i class="fas fa-clock mr-3 text-yellow-600"></i>
@@ -239,7 +239,7 @@
 <!-- Add Site Modal (reuse from dashboard) -->
 {% block modals %}
 <div id="addSiteModal" class="modal-backdrop fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white rounded-lg shadow-cf-xl w-full max-w-md mx-4">
+    <div class="bg-white dark:bg-cf-800 rounded-lg shadow-cf-xl w-full max-w-md mx-4 transition-colors duration-200">
         <div class="flex items-center justify-between p-6 border-b border-cf-200">
             <h3 class="text-lg font-semibold text-cf-900">Add New Site</h3>
             <button onclick="closeModal('addSiteModal')" class="text-cf-400 hover:text-cf-600">
