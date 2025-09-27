@@ -3,20 +3,20 @@
 {% block title %}Chart Test{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-cf-50 py-8">
+<div class="min-h-screen bg-cf-50 dark:bg-cf-900 py-8 transition-colors duration-200">
     <div class="max-w-4xl mx-auto px-4">
-        <h1 class="text-3xl font-bold text-cf-900 mb-8">Chart.js Test Page</h1>
+        <h1 class="text-3xl font-bold text-cf-900 dark:text-white mb-8">Chart.js Test Page</h1>
         
-        <div class="bg-white rounded-lg shadow-cf p-6 mb-8">
-            <h2 class="text-xl font-semibold text-cf-900 mb-4">Simple Test Chart</h2>
+        <div class="bg-white dark:bg-cf-800 rounded-lg shadow-cf p-6 mb-8 transition-colors duration-200">
+            <h2 class="text-xl font-semibold text-cf-900 dark:text-white mb-4">Simple Test Chart</h2>
             <div class="h-64">
                 <canvas id="testChart"></canvas>
             </div>
         </div>
         
-        <div class="bg-white rounded-lg shadow-cf p-6">
-            <h2 class="text-xl font-semibold text-cf-900 mb-4">Chart Status</h2>
-            <div id="chartStatus" class="text-cf-600">
+        <div class="bg-white dark:bg-cf-800 rounded-lg shadow-cf p-6 transition-colors duration-200">
+            <h2 class="text-xl font-semibold text-cf-900 dark:text-white mb-4">Chart Status</h2>
+            <div id="chartStatus" class="text-cf-600 dark:text-cf-300">
                 Checking Chart.js status...
             </div>
         </div>
@@ -35,8 +35,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     statusDiv.innerHTML = '<span class="text-green-600">✅ Chart.js is loaded successfully</span>';
     
-    // Create test chart
+    // Create test chart with dark mode support
     const ctx = document.getElementById('testChart').getContext('2d');
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    
     new Chart(ctx, {
         type: 'line',
         data: {
@@ -56,12 +58,32 @@ document.addEventListener('DOMContentLoaded', function() {
             plugins: {
                 title: {
                     display: true,
-                    text: 'Chart.js Test - Cloudflare Orange Theme'
+                    text: 'Chart.js Test - Cloudflare Orange Theme',
+                    color: isDarkMode ? '#f8fafc' : '#1e293b'
+                },
+                legend: {
+                    labels: {
+                        color: isDarkMode ? '#f8fafc' : '#1e293b'
+                    }
                 }
             },
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    grid: {
+                        color: isDarkMode ? '#334155' : '#f1f5f9'
+                    },
+                    ticks: {
+                        color: isDarkMode ? '#f8fafc' : '#1e293b'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: isDarkMode ? '#334155' : '#f1f5f9'
+                    },
+                    ticks: {
+                        color: isDarkMode ? '#f8fafc' : '#1e293b'
+                    }
                 }
             }
         }

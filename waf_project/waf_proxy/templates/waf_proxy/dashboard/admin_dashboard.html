@@ -591,10 +591,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         console.log('Canvas element found, proceeding with chart creation...');
 
-    // Cloudflare color palette
+    // Cloudflare color palette with dark mode support
+    const isDarkMode = document.documentElement.classList.contains('dark');
     const colors = {
         primary: '#f38020',      // Cloudflare Orange
-        secondary: '#1e293b',    // Cloudflare Dark Gray
+        secondary: isDarkMode ? '#cbd5e1' : '#1e293b',    // Light gray in dark mode
         success: '#10b981',      // Green
         danger: '#ef4444',       // Red
         warning: '#f59e0b',      // Amber
@@ -602,7 +603,10 @@ document.addEventListener('DOMContentLoaded', function() {
         purple: '#8b5cf6',       // Purple
         indigo: '#6366f1',       // Indigo
         pink: '#ec4899',         // Pink
-        gray: '#6b7280'          // Gray
+        gray: isDarkMode ? '#94a3b8' : '#6b7280',          // Lighter gray in dark mode
+        text: isDarkMode ? '#f8fafc' : '#1e293b',          // Text color
+        background: isDarkMode ? '#0f172a' : '#ffffff',     // Background color
+        grid: isDarkMode ? '#334155' : '#f1f5f9'           // Grid color
     };
 
     // Global Traffic Analytics Chart
@@ -655,7 +659,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     position: 'bottom',
                     labels: {
                         usePointStyle: true,
-                        padding: 20
+                        padding: 20,
+                        color: colors.text
                     }
                 }
             },

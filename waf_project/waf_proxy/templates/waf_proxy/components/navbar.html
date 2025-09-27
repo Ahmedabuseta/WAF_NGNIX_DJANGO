@@ -1,5 +1,5 @@
 <!-- Cloudflare-style Navigation Component -->
-<nav class="bg-white border-b border-cf-200 shadow-cf fixed top-0 w-full z-50">
+<nav class="bg-white dark:bg-cf-900 border-b border-cf-200 dark:border-cf-700 shadow-cf fixed top-0 w-full z-50 transition-colors duration-200">
     <div class="px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
             <!-- Logo and Brand -->
@@ -8,7 +8,7 @@
                     <div class="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-600 rounded-lg shadow-cf">
                         <i class="fas fa-shield-alt text-white text-sm"></i>
                     </div>
-                    <span class="text-xl font-semibold text-cf-900 tracking-tight">WAF Security</span>
+                    <span class="text-xl font-semibold text-cf-900 dark:text-white tracking-tight">WAF Security</span>
                 </a>
             </div>
 
@@ -17,7 +17,7 @@
                 <!-- Search Bar (hidden on mobile) -->
                 <div class="hidden md:block">
                     <div class="relative">
-                        <input type="text" placeholder="Search..." class="bg-cf-50 border border-cf-300 text-cf-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-64 pl-10 p-2.5">
+                        <input type="text" placeholder="Search..." class="bg-cf-50 dark:bg-cf-800 border border-cf-300 dark:border-cf-600 text-cf-900 dark:text-white text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-64 pl-10 p-2.5">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i class="fas fa-search text-cf-400"></i>
                         </div>
@@ -25,6 +25,12 @@
                 </div>
 
                 {% if user.is_authenticated %}
+                    <!-- Dark Mode Toggle -->
+                    <button type="button" id="dark-mode-toggle" class="p-2 text-cf-400 dark:text-cf-300 hover:text-cf-600 dark:hover:text-cf-100 hover:bg-cf-100 dark:hover:bg-cf-800 rounded-lg transition-colors duration-200" title="Toggle Dark Mode">
+                        <i class="fas fa-moon w-5 h-5 dark:hidden"></i>
+                        <i class="fas fa-sun w-5 h-5 hidden dark:block"></i>
+                    </button>
+
                     <!-- Notifications -->
                     <button type="button" class="relative p-2 text-cf-400 hover:text-cf-600 hover:bg-cf-100 rounded-lg transition-colors duration-200">
                         <i class="fas fa-bell w-5 h-5"></i>

@@ -117,6 +117,15 @@
             --text-muted: var(--gray-400);
             --text-white: var(--white);
             
+            /* Dark Mode Colors */
+            --dark-bg-primary: #0f172a;
+            --dark-bg-secondary: #1e293b;
+            --dark-bg-tertiary: #334155;
+            --dark-text-primary: #f8fafc;
+            --dark-text-secondary: #cbd5e1;
+            --dark-text-muted: #94a3b8;
+            --dark-border: #475569;
+            
             /* Background Colors */
             --bg-primary: var(--white);
             --bg-secondary: var(--gray-50);
@@ -465,15 +474,72 @@
             border-color: #93c5fd;
             color: #1e40af;
         }
+        
+        /* Dark Mode Styles */
+        .dark {
+            color-scheme: dark;
+        }
+        
+        .dark body {
+            background-color: var(--dark-bg-primary);
+            color: var(--dark-text-primary);
+        }
+        
+        /* Dark mode transitions */
+        * {
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
-<body class="bg-cf-50 font-sans antialiased pt-16">
+<body class="bg-cf-50 dark:bg-cf-900 font-sans antialiased pt-16 transition-colors duration-200">
     {% block content %}{% endblock %}
     
     <!-- Flowbite JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
     
+    <!-- Dark Mode JavaScript -->
+    <script>
+        // Dark Mode Functionality
+        function initDarkMode() {
+            const darkModeToggle = document.getElementById('dark-mode-toggle');
+            const html = document.documentElement;
+            
+            // Check for saved theme preference or default to 'light'
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            
+            // Apply the saved theme
+            if (currentTheme === 'dark') {
+                html.classList.add('dark');
+            } else {
+                html.classList.remove('dark');
+            }
+            
+            // Toggle dark mode
+            if (darkModeToggle) {
+                darkModeToggle.addEventListener('click', function() {
+                    html.classList.toggle('dark');
+                    
+                    // Save the preference
+                    const newTheme = html.classList.contains('dark') ? 'dark' : 'light';
+                    localStorage.setItem('theme', newTheme);
+                    
+                    // Update charts if they exist
+                    updateChartsForDarkMode(newTheme);
+                });
+            }
+        }
+        
+        // Update charts for dark mode
+        function updateChartsForDarkMode(theme) {
+            // This will be called when charts are updated
+            console.log('Dark mode changed to:', theme);
+        }
+        
+        // Initialize dark mode on page load
+        document.addEventListener('DOMContentLoaded', initDarkMode);
+    </script>
+
     <!-- Modal JavaScript -->
     <script>
         // Global modal functions
