@@ -84,8 +84,8 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            BASE_DIR / 'templates',  # Centralized templates directory
-            BASE_DIR / 'waf_proxy' / 'templates',  # Legacy templates (for backward compatibility)
+            BASE_DIR / 'waf_project' / 'templates',  # Centralized templates directory
+            BASE_DIR / 'waf_project' / 'waf_proxy' / 'templates',  # Legacy templates (for backward compatibility)
         ],
         'APP_DIRS': True,
         'OPTIONS': {
