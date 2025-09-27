@@ -332,7 +332,9 @@
             <p class="text-sm text-cf-600 mt-1">All customers - Last 30 days</p>
         </div>
         <div class="p-6">
-            <canvas id="globalTrafficChart" width="400" height="200"></canvas>
+            <div class="h-64">
+                <canvas id="globalTrafficChart"></canvas>
+            </div>
         </div>
     </div>
 
@@ -346,7 +348,9 @@
             <p class="text-sm text-cf-600 mt-1">Security events by type</p>
         </div>
         <div class="p-6">
-            <canvas id="threatChart" width="400" height="200"></canvas>
+            <div class="h-64">
+                <canvas id="threatChart"></canvas>
+            </div>
         </div>
     </div>
 </div>
@@ -409,7 +413,9 @@
             <p class="text-sm text-cf-600 mt-1">New customers over time</p>
         </div>
         <div class="p-6">
-            <canvas id="customerGrowthChart" width="400" height="200"></canvas>
+            <div class="h-64">
+                <canvas id="customerGrowthChart"></canvas>
+            </div>
         </div>
     </div>
 
@@ -423,7 +429,9 @@
             <p class="text-sm text-cf-600 mt-1">Average response times</p>
         </div>
         <div class="p-6">
-            <canvas id="performanceChart" width="400" height="200"></canvas>
+            <div class="h-64">
+                <canvas id="performanceChart"></canvas>
+            </div>
         </div>
     </div>
 </div>
@@ -581,30 +589,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         console.log('Canvas element found:', testElement);
         
-        // Create a simple test chart first
-        try {
-            const testCtx = testElement.getContext('2d');
-            const testChart = new Chart(testCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Test'],
-                    datasets: [{
-                        label: 'Test Data',
-                        data: [1],
-                        borderColor: '#f38020',
-                        backgroundColor: '#f38020'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            });
-            console.log('Test chart created successfully:', testChart);
-        } catch (error) {
-            console.error('Error creating test chart:', error);
-            return;
-        }
+        console.log('Canvas element found, proceeding with chart creation...');
 
     // Cloudflare color palette
     const colors = {
@@ -659,6 +644,8 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
+            maintainAspectRatio: false,
             interaction: {
                 intersect: false,
                 mode: 'index'
@@ -687,6 +674,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+    console.log('✅ Global Traffic chart created successfully');
 
     // Threat Detection Breakdown Chart
     const threatElement = document.getElementById('threatChart');
@@ -694,6 +682,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('threatChart element not found');
         return;
     }
+    console.log('Creating Threat Detection chart...');
     const threatCtx = threatElement.getContext('2d');
     new Chart(threatCtx, {
         type: 'bar',
@@ -716,6 +705,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     display: false
@@ -736,6 +726,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+    console.log('✅ Threat Detection chart created successfully');
 
     // Customer Growth Chart
     const customerGrowthElement = document.getElementById('customerGrowthChart');
@@ -743,6 +734,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('customerGrowthChart element not found');
         return;
     }
+    console.log('Creating Customer Growth chart...');
     const customerGrowthCtx = customerGrowthElement.getContext('2d');
     new Chart(customerGrowthCtx, {
         type: 'bar',
@@ -758,6 +750,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     display: false
@@ -778,6 +771,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+    console.log('✅ Customer Growth chart created successfully');
 
     // Performance Chart
     const performanceElement = document.getElementById('performanceChart');
@@ -785,6 +779,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('performanceChart element not found');
         return;
     }
+    console.log('Creating Performance chart...');
     const performanceCtx = performanceElement.getContext('2d');
     new Chart(performanceCtx, {
         type: 'line',
@@ -802,6 +797,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     display: false
@@ -904,6 +900,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         ]
     });
+    console.log('✅ Performance chart created successfully');
     
     }, 100); // End of setTimeout
 });
