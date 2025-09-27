@@ -563,22 +563,33 @@ function enableMaintenance() {
 
 // Initialize Admin Analytics Charts
 document.addEventListener('DOMContentLoaded', function() {
+    // Check if Chart.js is loaded
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js is not loaded');
+        return;
+    }
+
     // Cloudflare color palette
     const colors = {
-        primary: '#f97316',
-        secondary: '#3b82f6',
-        success: '#10b981',
-        danger: '#ef4444',
-        warning: '#f59e0b',
-        info: '#06b6d4',
-        purple: '#8b5cf6',
-        indigo: '#6366f1',
-        pink: '#ec4899',
-        gray: '#6b7280'
+        primary: '#f38020',      // Cloudflare Orange
+        secondary: '#1e293b',    // Cloudflare Dark Gray
+        success: '#10b981',      // Green
+        danger: '#ef4444',       // Red
+        warning: '#f59e0b',      // Amber
+        info: '#06b6d4',         // Cyan
+        purple: '#8b5cf6',       // Purple
+        indigo: '#6366f1',       // Indigo
+        pink: '#ec4899',         // Pink
+        gray: '#6b7280'          // Gray
     };
 
     // Global Traffic Analytics Chart
-    const globalTrafficCtx = document.getElementById('globalTrafficChart').getContext('2d');
+    const globalTrafficElement = document.getElementById('globalTrafficChart');
+    if (!globalTrafficElement) {
+        console.error('globalTrafficChart element not found');
+        return;
+    }
+    const globalTrafficCtx = globalTrafficElement.getContext('2d');
     new Chart(globalTrafficCtx, {
         type: 'line',
         data: {
@@ -641,7 +652,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Threat Detection Breakdown Chart
-    const threatCtx = document.getElementById('threatChart').getContext('2d');
+    const threatElement = document.getElementById('threatChart');
+    if (!threatElement) {
+        console.error('threatChart element not found');
+        return;
+    }
+    const threatCtx = threatElement.getContext('2d');
     new Chart(threatCtx, {
         type: 'bar',
         data: {
@@ -685,7 +701,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Customer Growth Chart
-    const customerGrowthCtx = document.getElementById('customerGrowthChart').getContext('2d');
+    const customerGrowthElement = document.getElementById('customerGrowthChart');
+    if (!customerGrowthElement) {
+        console.error('customerGrowthChart element not found');
+        return;
+    }
+    const customerGrowthCtx = customerGrowthElement.getContext('2d');
     new Chart(customerGrowthCtx, {
         type: 'bar',
         data: {
@@ -722,7 +743,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Performance Chart
-    const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+    const performanceElement = document.getElementById('performanceChart');
+    if (!performanceElement) {
+        console.error('performanceChart element not found');
+        return;
+    }
+    const performanceCtx = performanceElement.getContext('2d');
     new Chart(performanceCtx, {
         type: 'line',
         data: {

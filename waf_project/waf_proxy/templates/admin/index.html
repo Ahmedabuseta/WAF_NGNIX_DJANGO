@@ -236,8 +236,9 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     // Traffic Analytics Chart
-    const trafficCtx = document.getElementById('adminTrafficChart');
-    if (trafficCtx) {
+    const trafficElement = document.getElementById('adminTrafficChart');
+    if (trafficElement) {
+        const trafficCtx = trafficElement.getContext('2d');
         new Chart(trafficCtx, {
             type: 'line',
             data: {
@@ -290,8 +291,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Security Events Chart
-    const securityCtx = document.getElementById('adminSecurityChart');
-    if (securityCtx) {
+    const securityElement = document.getElementById('adminSecurityChart');
+    if (securityElement) {
+        const securityCtx = securityElement.getContext('2d');
         new Chart(securityCtx, {
             type: 'doughnut',
             data: {
