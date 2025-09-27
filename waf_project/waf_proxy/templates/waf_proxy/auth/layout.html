@@ -55,6 +55,11 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     background-color: var(--bg-primary);
+    transition: background-color 0.2s ease;
+}
+
+.dark .auth-container {
+    background-color: var(--dark-bg-primary);
 }
 
 .auth-brand {
@@ -146,6 +151,11 @@
     justify-content: center;
     padding: var(--spacing-8);
     background-color: var(--bg-secondary);
+    transition: background-color 0.2s ease;
+}
+
+.dark .auth-form {
+    background-color: var(--dark-bg-secondary);
 }
 
 .auth-card {
@@ -155,6 +165,12 @@
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow-lg);
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.dark .auth-card {
+    background-color: var(--dark-bg-secondary);
+    border-color: var(--dark-border);
 }
 
 .auth-header {

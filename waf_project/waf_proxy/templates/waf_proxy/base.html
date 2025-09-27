@@ -17,6 +17,7 @@
     <!-- Cloudflare-style Tailwind Configuration -->
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -505,28 +506,39 @@
             const darkModeToggle = document.getElementById('dark-mode-toggle');
             const html = document.documentElement;
             
+            console.log('Initializing dark mode...');
+            console.log('Dark mode toggle element:', darkModeToggle);
+            
             // Check for saved theme preference or default to 'light'
             const currentTheme = localStorage.getItem('theme') || 'light';
+            console.log('Current theme from localStorage:', currentTheme);
             
             // Apply the saved theme
             if (currentTheme === 'dark') {
                 html.classList.add('dark');
+                console.log('Applied dark theme');
             } else {
                 html.classList.remove('dark');
+                console.log('Applied light theme');
             }
             
             // Toggle dark mode
             if (darkModeToggle) {
+                console.log('Adding click event listener to dark mode toggle');
                 darkModeToggle.addEventListener('click', function() {
+                    console.log('Dark mode toggle clicked');
                     html.classList.toggle('dark');
                     
                     // Save the preference
                     const newTheme = html.classList.contains('dark') ? 'dark' : 'light';
                     localStorage.setItem('theme', newTheme);
+                    console.log('Theme changed to:', newTheme);
                     
                     // Update charts if they exist
                     updateChartsForDarkMode(newTheme);
                 });
+            } else {
+                console.error('Dark mode toggle button not found!');
             }
         }
         
