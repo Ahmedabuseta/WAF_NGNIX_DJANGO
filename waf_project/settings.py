@@ -37,7 +37,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    # Custom apps
+    'core',
+    'accounts',
+    'sites',
+    'security',
+    'dashboard',
+    'admin_panel',
+    
+    # Legacy app (to be removed after migration)
     'waf_proxy',
+    
     'django.contrib.sites',
     'allauth',
     'allauth.account',
@@ -53,7 +64,7 @@ ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 
 # طرق تسجيل الدخول المسموحة (بما إن مفيش username عندك)
 ACCOUNT_LOGIN_METHODS = {"email"}
-AUTH_USER_MODEL = 'waf_proxy.User'
+AUTH_USER_MODEL = 'accounts.User'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -140,7 +151,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom User Model
-AUTH_USER_MODEL = 'waf_proxy.User'
+AUTH_USER_MODEL = 'accounts.User'
 
 # Custom Authentication Backend
 
