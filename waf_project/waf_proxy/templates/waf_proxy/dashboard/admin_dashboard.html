@@ -563,11 +563,48 @@ function enableMaintenance() {
 
 // Initialize Admin Analytics Charts
 document.addEventListener('DOMContentLoaded', function() {
-    // Check if Chart.js is loaded
-    if (typeof Chart === 'undefined') {
-        console.error('Chart.js is not loaded');
-        return;
-    }
+    // Wait a bit to ensure Chart.js is fully loaded
+    setTimeout(function() {
+        // Check if Chart.js is loaded
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js is not loaded');
+            return;
+        }
+        
+        console.log('Chart.js loaded, initializing charts...');
+        
+        // Test if we can create a simple chart first
+        const testElement = document.getElementById('globalTrafficChart');
+        if (!testElement) {
+            console.error('globalTrafficChart canvas element not found');
+            return;
+        }
+        console.log('Canvas element found:', testElement);
+        
+        // Create a simple test chart first
+        try {
+            const testCtx = testElement.getContext('2d');
+            const testChart = new Chart(testCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Test'],
+                    datasets: [{
+                        label: 'Test Data',
+                        data: [1],
+                        borderColor: '#f38020',
+                        backgroundColor: '#f38020'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            console.log('Test chart created successfully:', testChart);
+        } catch (error) {
+            console.error('Error creating test chart:', error);
+            return;
+        }
 
     // Cloudflare color palette
     const colors = {
@@ -867,6 +904,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         ]
     });
+    
+    }, 100); // End of setTimeout
 });
 </script>
 {% endblock %}
