@@ -39,7 +39,7 @@ def send_verification_email(user):
 
     # Render email templates
     subject = f"Verify your email - {context['site_name']}"
-    html_message = render_to_string('waf_proxy/emails/verification_email.html', context)
+    html_message = render_to_string('emails/verification_email.html', context)
     plain_message = f"Please click the following link to verify your email: {verification_url}"
 
     try:
@@ -85,7 +85,7 @@ def send_password_reset_email(user):
 
     # Render email templates
     subject = f"Password Reset - {context['site_name']}"
-    html_message = render_to_string('waf_proxy/emails/password_reset_email.html', context)
+    html_message = render_to_string('emails/password_reset_email.html', context)
     plain_message = f"Please click the following link to reset your password: {reset_url}"
 
     try:
@@ -116,7 +116,7 @@ def send_welcome_email(user):
 
     # Render email templates
     subject = f"Welcome to {context['site_name']}!"
-    html_message = render_to_string('waf_proxy/emails/welcome_email.html', context)
+    html_message = render_to_string('emails/welcome_email.html', context)
     plain_message = f"Welcome to {context['site_name']}! You can now log in and start using our services."
 
     try:

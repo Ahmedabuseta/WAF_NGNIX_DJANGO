@@ -1,5 +1,5 @@
 from django.db import models
-from sites.models import Site
+from web_sites.models import Site
 
 
 class Rule(models.Model):

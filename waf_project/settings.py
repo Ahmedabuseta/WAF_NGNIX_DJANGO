@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     # Custom apps
     'core',
     'accounts',
-    'sites',
+    'web_sites',
     'security',
     'dashboard',
     'admin_panel',
@@ -83,7 +83,10 @@ ROOT_URLCONF = 'urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'waf_proxy' / 'templates'],
+        'DIRS': [
+            BASE_DIR / 'templates',  # Centralized templates directory
+            BASE_DIR / 'waf_proxy' / 'templates',  # Legacy templates (for backward compatibility)
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

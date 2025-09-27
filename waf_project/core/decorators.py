@@ -69,7 +69,7 @@ def site_owner_required(view_func):
 
         site_id = kwargs.get('site_id')
         if site_id:
-            from sites.models import Site
+            from web_sites.models import Site
             try:
                 site = Site.objects.get(id=site_id)
                 if site.owner != request.user and request.user.user_type != 'admin':

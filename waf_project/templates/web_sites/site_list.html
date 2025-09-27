@@ -1,0 +1,262 @@
+{% extends "base/main_layout.html" %}
+
+{% block page_title %}My Sites{% endblock %}
+{% block page_subtitle %}Manage your protected websites{% endblock %}
+
+{% block breadcrumb_items %}
+<li>
+    <div class="flex items-center">
+        <i class="fas fa-chevron-right text-cf-400 w-3 h-3 mx-1"></i>
+        <span class="ml-1 text-sm font-medium text-cf-500">My Sites</span>
+    </div>
+</li>
+{% endblock %}
+
+{% block page_actions %}
+<button onclick="openModal('addSiteModal')" class="bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg text-sm px-4 py-2.5 transition-colors duration-200 flex items-center">
+    <i class="fas fa-plus mr-2"></i>
+    Add Site
+</button>
+<button onclick="openModal('bulkActionsModal')" class="text-cf-700 bg-white border border-cf-300 hover:bg-cf-50 font-medium rounded-lg text-sm px-4 py-2.5 transition-colors duration-200 flex items-center">
+    <i class="fas fa-tasks mr-2"></i>
+    Bulk Actions
+</button>
+{% endblock %}
+
+{% block main_content %}
+<!-- Sites Grid -->
+{% if sites %}
+    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        {% for site in sites %}
+        <div class="bg-white border border-cf-200 rounded-lg shadow-cf hover:shadow-cf-md transition-all duration-200 group">
+            <!-- Site Header -->
+            <div class="p-6 border-b border-cf-200">
+                <div class="flex items-start justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-secondary-500 to-primary-600 rounded-lg flex items-center justify-center shadow-cf">
+                            <i class="fas fa-globe text-white"></i>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h3 class="text-lg font-medium text-cf-900 truncate">{{ site.domain }}</h3>
+                            <p class="text-sm text-cf-600 font-mono truncate">{{ site.backend_url|truncatechars:30 }}</p>
+                        </div>
+                    </div>
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {% if site.is_active %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                        {% if site.is_active %}
+                            <i class="fas fa-check-circle mr-1"></i>Active
+                        {% else %}
+                            <i class="fas fa-pause-circle mr-1"></i>Inactive
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Site Stats -->
+            <div class="p-6">
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="text-center">
+                        <div class="text-xl font-bold text-cf-900">
+                            {% with site.requestlog_set.count as req_count %}
+                                {{ req_count|default:0 }}
+                            {% endwith %}
+                        </div>
+                        <div class="text-sm text-cf-600">Requests</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-xl font-bold text-cf-900">
+                            {% with site.siterule_set.filter.is_active.count as rule_count %}
+                                {{ rule_count|default:0 }}
+                            {% endwith %}
+                        </div>
+                        <div class="text-sm text-cf-600">Rules</div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="space-y-2">
+                    <a href="{% url 'site_detail' site.id %}" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg text-sm px-4 py-2.5 transition-colors duration-200 flex items-center justify-center">
+                        <i class="fas fa-cog mr-2"></i>
+                        Manage
+                    </a>
+                    <div class="grid grid-cols-2 gap-2">
+                        <a href="{% url 'site_rules' site.id %}" class="text-cf-700 bg-white border border-cf-300 hover:bg-cf-50 font-medium rounded-lg text-sm px-3 py-2 transition-colors duration-200 flex items-center justify-center">
+                            <i class="fas fa-shield-virus mr-1"></i>
+                            Rules
+                        </a>
+                        <a href="{% url 'site_stats' site.id %}" class="text-cf-700 bg-white border border-cf-300 hover:bg-cf-50 font-medium rounded-lg text-sm px-3 py-2 transition-colors duration-200 flex items-center justify-center">
+                            <i class="fas fa-chart-bar mr-1"></i>
+                            Stats
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Status Indicator -->
+            <div class="px-6 pb-6">
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-cf-600">Protection Status</span>
+                    <div class="flex items-center space-x-2">
+                        {% if site.is_active %}
+                            <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                            <span class="text-green-600 font-medium">Protected</span>
+                        {% else %}
+                            <div class="w-2 h-2 bg-red-400 rounded-full"></div>
+                            <span class="text-red-600 font-medium">Unprotected</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination if needed -->
+    {% if sites.has_other_pages %}
+    <div class="mt-8 flex justify-center">
+        <nav class="flex items-center space-x-2">
+            {% if sites.has_previous %}
+                <a href="?page={{ sites.previous_page_number }}" class="px-3 py-2 text-cf-700 bg-white border border-cf-300 rounded-lg hover:bg-cf-50 transition-colors duration-200">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            {% endif %}
+            
+            <span class="px-3 py-2 text-sm text-cf-600">
+                Page {{ sites.number }} of {{ sites.paginator.num_pages }}
+            </span>
+            
+            {% if sites.has_next %}
+                <a href="?page={{ sites.next_page_number }}" class="px-3 py-2 text-cf-700 bg-white border border-cf-300 rounded-lg hover:bg-cf-50 transition-colors duration-200">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+
+{% else %}
+    <!-- Empty State -->
+    <div class="bg-white border border-cf-200 rounded-lg shadow-cf">
+        <div class="p-12 text-center">
+            <i class="fas fa-globe text-cf-300 text-6xl mb-6"></i>
+            <h3 class="text-xl font-semibold text-cf-900 mb-3">No Sites Protected Yet</h3>
+            <p class="text-cf-600 mb-8 max-w-md mx-auto">Start protecting your websites with our advanced Web Application Firewall. Add your first site to get started.</p>
+            <button onclick="openModal('addSiteModal')" class="bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg px-8 py-3 transition-colors duration-200 inline-flex items-center">
+                <i class="fas fa-plus mr-2"></i>
+                Add Your First Site
+            </button>
+        </div>
+    </div>
+{% endif %}
+
+<!-- Modals -->
+{% block modals %}
+<!-- Add Site Modal -->
+<div id="addSiteModal" class="modal-backdrop fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-lg shadow-cf-xl w-full max-w-md mx-4">
+        <div class="flex items-center justify-between p-6 border-b border-cf-200">
+            <h3 class="text-lg font-semibold text-cf-900">Add New Site</h3>
+            <button onclick="closeModal('addSiteModal')" class="text-cf-400 hover:text-cf-600">
+                <i class="fas fa-times w-5 h-5"></i>
+            </button>
+        </div>
+        <form action="{% url 'site_add' %}" method="post" class="p-6 space-y-4">
+            {% csrf_token %}
+            <div>
+                <label for="domain" class="block text-sm font-medium text-cf-900 mb-2">Domain</label>
+                <input type="text" id="domain" name="domain" class="w-full px-3 py-2 border border-cf-300 rounded-lg focus:ring-primary-500 focus:border-primary-500" placeholder="example.com" required>
+                <p class="mt-1 text-xs text-cf-500">Enter the domain you want to protect</p>
+            </div>
+            <div>
+                <label for="backend_url" class="block text-sm font-medium text-cf-900 mb-2">Backend URL</label>
+                <input type="url" id="backend_url" name="backend_url" class="w-full px-3 py-2 border border-cf-300 rounded-lg focus:ring-primary-500 focus:border-primary-500" placeholder="https://backend.example.com" required>
+                <p class="mt-1 text-xs text-cf-500">Your actual server URL where traffic will be forwarded</p>
+            </div>
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div class="flex">
+                    <i class="fas fa-info-circle text-blue-600 mr-3 mt-0.5"></i>
+                    <div>
+                        <h4 class="text-sm font-medium text-blue-800">Getting Started</h4>
+                        <p class="text-sm text-blue-700 mt-1">After adding your site, you'll need to configure DNS to point to our WAF servers for protection to take effect.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-end space-x-3 pt-4">
+                <button type="button" onclick="closeModal('addSiteModal')" class="px-4 py-2 text-cf-700 bg-white border border-cf-300 rounded-lg hover:bg-cf-50 transition-colors duration-200">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors duration-200">
+                    Add Site
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bulk Actions Modal -->
+<div id="bulkActionsModal" class="modal-backdrop fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-lg shadow-cf-xl w-full max-w-md mx-4">
+        <div class="flex items-center justify-between p-6 border-b border-cf-200">
+            <h3 class="text-lg font-semibold text-cf-900">Bulk Actions</h3>
+            <button onclick="closeModal('bulkActionsModal')" class="text-cf-400 hover:text-cf-600">
+                <i class="fas fa-times w-5 h-5"></i>
+            </button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div class="space-y-3">
+                <button onclick="bulkAction('enable')" class="w-full flex items-center p-3 rounded-lg hover:bg-green-50 border border-cf-300 transition-colors duration-200">
+                    <i class="fas fa-play w-5 h-5 text-green-600 mr-3"></i>
+                    <div class="text-left">
+                        <div class="font-medium text-cf-900">Enable All Sites</div>
+                        <div class="text-sm text-cf-500">Turn on protection for all sites</div>
+                    </div>
+                </button>
+                <button onclick="bulkAction('disable')" class="w-full flex items-center p-3 rounded-lg hover:bg-yellow-50 border border-cf-300 transition-colors duration-200">
+                    <i class="fas fa-pause w-5 h-5 text-yellow-600 mr-3"></i>
+                    <div class="text-left">
+                        <div class="font-medium text-cf-900">Pause All Sites</div>
+                        <div class="text-sm text-cf-500">Temporarily disable protection</div>
+                    </div>
+                </button>
+                <button onclick="bulkAction('export')" class="w-full flex items-center p-3 rounded-lg hover:bg-blue-50 border border-cf-300 transition-colors duration-200">
+                    <i class="fas fa-download w-5 h-5 text-blue-600 mr-3"></i>
+                    <div class="text-left">
+                        <div class="font-medium text-cf-900">Export All Sites</div>
+                        <div class="text-sm text-cf-500">Download sites configuration</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<script>
+function bulkAction(action) {
+    let message = '';
+    let confirmMessage = '';
+    
+    switch(action) {
+        case 'enable':
+            message = 'All sites have been enabled for protection.';
+            confirmMessage = 'Are you sure you want to enable protection for all sites?';
+            break;
+        case 'disable':
+            message = 'All sites have been paused.';
+            confirmMessage = 'Are you sure you want to pause protection for all sites?';
+            break;
+        case 'export':
+            message = 'Sites configuration exported successfully!';
+            confirmMessage = 'Export all sites configuration?';
+            break;
+    }
+    
+    if (confirm(confirmMessage)) {
+        closeModal('bulkActionsModal');
+        // Show loading and success
+        setTimeout(() => {
+            alert(message);
+        }, 500);
+    }
+}
+</script>
+{% endblock %}

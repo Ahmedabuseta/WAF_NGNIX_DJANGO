@@ -70,7 +70,7 @@ class User(AbstractBaseUser):
             # Return common Django permissions for admin users
             return {
                 'auth.add_user', 'auth.change_user', 'auth.delete_user', 'auth.view_user',
-                'sites.add_site', 'sites.change_site', 'sites.delete_site', 'sites.view_site',
+                'web_sites.add_site', 'web_sites.change_site', 'web_sites.delete_site', 'web_sites.view_site',
                 'security.add_rule', 'security.change_rule', 'security.delete_rule', 'security.view_rule',
                 'security.view_requestlog', 'security.delete_requestlog'
             }
@@ -85,7 +85,7 @@ class User(AbstractBaseUser):
         if self.user_type == 'admin':
             return {
                 'auth.add_user', 'auth.change_user', 'auth.delete_user', 'auth.view_user',
-                'sites.add_site', 'sites.change_site', 'sites.delete_site', 'sites.view_site',
+                'web_sites.add_site', 'web_sites.change_site', 'web_sites.delete_site', 'web_sites.view_site',
                 'security.add_rule', 'security.change_rule', 'security.delete_rule', 'security.view_rule',
                 'security.view_requestlog', 'security.delete_requestlog'
             }

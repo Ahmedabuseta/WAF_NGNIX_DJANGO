@@ -1,0 +1,283 @@
+{% extends 'base/main_layout.html' %}
+
+{% block page_title %}Settings{% endblock %}
+{% block page_subtitle %}Manage your account preferences and security settings{% endblock %}
+
+{% block breadcrumb_items %}
+<li>
+    <div class="flex items-center">
+        <i class="fas fa-chevron-right text-cf-400 w-3 h-3 mx-1"></i>
+        <span class="ml-1 text-sm font-medium text-cf-500">Settings</span>
+    </div>
+</li>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'profile' %}" class="text-cf-700 bg-white border border-cf-300 hover:bg-cf-50 font-medium rounded-lg text-sm px-4 py-2.5 transition-colors duration-200 flex items-center">
+    <i class="fas fa-user mr-2"></i>
+    View Profile
+</a>
+{% endblock %}
+
+{% block main_content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Settings Navigation Tabs -->
+    <div class="border-b border-cf-200 mb-8">
+        <nav class="-mb-px flex space-x-8">
+            <button onclick="showTab('general')" id="general-tab" class="tab-button py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 border-primary-500 text-primary-600">
+                General
+            </button>
+            <button onclick="showTab('security')" id="security-tab" class="tab-button py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 border-transparent text-cf-500 hover:text-cf-700 hover:border-cf-300">
+                Security
+            </button>
+            <button onclick="showTab('notifications')" id="notifications-tab" class="tab-button py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 border-transparent text-cf-500 hover:text-cf-700 hover:border-cf-300">
+                Notifications
+            </button>
+        </nav>
+    </div>
+
+    <!-- General Settings Tab -->
+    <div id="general-content" class="tab-content">
+        <form method="post" class="space-y-8">
+            {% csrf_token %}
+            
+            <!-- Personal Information -->
+            <div class="bg-white dark:bg-cf-800 shadow-cf rounded-lg border border-cf-200 dark:border-cf-700 transition-colors duration-200">
+                <div class="px-6 py-4 border-b border-cf-200 dark:border-cf-700">
+                    <h3 class="text-lg font-medium text-cf-900 flex items-center">
+                        <i class="fas fa-user mr-3 text-primary-600"></i>
+                        Personal Information
+                    </h3>
+                    <p class="mt-1 text-sm text-cf-500">Update your personal details and contact information.</p>
+                </div>
+                <div class="px-6 py-6 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="first_name" class="block text-sm font-medium text-cf-900 mb-2">First Name</label>
+                            <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" 
+                                   class="w-full px-3 py-2 border border-cf-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200">
+                        </div>
+                        <div>
+                            <label for="last_name" class="block text-sm font-medium text-cf-900 mb-2">Last Name</label>
+                            <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" 
+                                   class="w-full px-3 py-2 border border-cf-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-cf-900 mb-2">Email Address</label>
+                        <input type="email" id="email" name="email" value="{{ user.email }}" 
+                               class="w-full px-3 py-2 border border-cf-300 rounded-lg bg-cf-50 text-cf-500" readonly>
+                        <p class="mt-1 text-xs text-cf-500">Email address cannot be changed. Contact support if needed.</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="company_name" class="block text-sm font-medium text-cf-900 mb-2">Company Name</label>
+                            <input type="text" id="company_name" name="company_name" value="{{ user.company_name }}" 
+                                   class="w-full px-3 py-2 border border-cf-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200">
+                        </div>
+                        <div>
+                            <label for="phone" class="block text-sm font-medium text-cf-900 mb-2">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" value="{{ user.phone }}" 
+                                   class="w-full px-3 py-2 border border-cf-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Status -->
+            <div class="bg-white dark:bg-cf-800 shadow-cf rounded-lg border border-cf-200 dark:border-cf-700 transition-colors duration-200">
+                <div class="px-6 py-4 border-b border-cf-200 dark:border-cf-700">
+                    <h3 class="text-lg font-medium text-cf-900 flex items-center">
+                        <i class="fas fa-shield-check mr-3 text-secondary-600"></i>
+                        Account Status
+                    </h3>
+                </div>
+                <div class="px-6 py-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="flex items-center justify-between p-4 bg-cf-50 rounded-lg">
+                            <div>
+                                <div class="font-medium text-cf-900">Account Type</div>
+                                <div class="text-sm text-cf-500">Your current plan</div>
+                            </div>
+                            <span class="px-3 py-1 text-sm font-medium rounded-full {% if user.user_type == 'admin' %}bg-primary-100 text-primary-800{% else %}bg-secondary-100 text-secondary-800{% endif %}">
+                                {{ user.user_type|title }}
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-4 bg-cf-50 rounded-lg">
+                            <div>
+                                <div class="font-medium text-cf-900">Email Status</div>
+                                <div class="text-sm text-cf-500">Verification status</div>
+                            </div>
+                            <span class="px-3 py-1 text-sm font-medium rounded-full {% if user.is_email_verified %}bg-green-100 text-green-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                {% if user.is_email_verified %}Verified{% else %}Unverified{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="flex justify-end">
+                <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg px-6 py-3 transition-colors duration-200">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Security Settings Tab -->
+    <div id="security-content" class="tab-content hidden">
+        <div class="space-y-8">
+            <!-- Change Password -->
+            <div class="bg-white dark:bg-cf-800 shadow-cf rounded-lg border border-cf-200 dark:border-cf-700 transition-colors duration-200">
+                <div class="px-6 py-4 border-b border-cf-200 dark:border-cf-700">
+                    <h3 class="text-lg font-medium text-cf-900 flex items-center">
+                        <i class="fas fa-lock mr-3 text-red-600"></i>
+                        Change Password
+                    </h3>
+                    <p class="mt-1 text-sm text-cf-500">Update your password to keep your account secure.</p>
+                </div>
+                <div class="px-6 py-6">
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                        <div class="flex">
+                            <i class="fas fa-info-circle text-yellow-600 mr-3 mt-0.5"></i>
+                            <div>
+                                <h4 class="text-sm font-medium text-yellow-800">Password Change</h4>
+                                <p class="text-sm text-yellow-700 mt-1">To change your password, please use the "Forgot Password" link on the login page or contact support.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="{% url 'forgot_password' %}" class="bg-secondary-600 hover:bg-secondary-700 text-white font-medium rounded-lg px-4 py-2 transition-colors duration-200 inline-flex items-center">
+                        <i class="fas fa-key mr-2"></i>
+                        Reset Password via Email
+                    </a>
+                </div>
+            </div>
+
+            <!-- Two-Factor Authentication -->
+            <div class="bg-white dark:bg-cf-800 shadow-cf rounded-lg border border-cf-200 dark:border-cf-700 transition-colors duration-200">
+                <div class="px-6 py-4 border-b border-cf-200 dark:border-cf-700">
+                    <h3 class="text-lg font-medium text-cf-900 flex items-center">
+                        <i class="fas fa-mobile-alt mr-3 text-secondary-600"></i>
+                        Two-Factor Authentication
+                    </h3>
+                    <p class="mt-1 text-sm text-cf-500">Add an extra layer of security to your account.</p>
+                </div>
+                <div class="px-6 py-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="font-medium text-cf-900">Two-Factor Authentication</div>
+                            <div class="text-sm text-cf-500">Secure your account with 2FA</div>
+                        </div>
+                        <button onclick="openModal('twoFactorModal')" class="bg-secondary-600 hover:bg-secondary-700 text-white font-medium rounded-lg px-4 py-2 transition-colors duration-200">
+                            Enable 2FA
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Settings Tab -->
+    <div id="notifications-content" class="tab-content hidden">
+        <div class="space-y-8">
+            <div class="bg-white dark:bg-cf-800 shadow-cf rounded-lg border border-cf-200 dark:border-cf-700 transition-colors duration-200">
+                <div class="px-6 py-4 border-b border-cf-200 dark:border-cf-700">
+                    <h3 class="text-lg font-medium text-cf-900 flex items-center">
+                        <i class="fas fa-bell mr-3 text-yellow-600"></i>
+                        Notification Preferences
+                    </h3>
+                    <p class="mt-1 text-sm text-cf-500">Choose what notifications you want to receive.</p>
+                </div>
+                <div class="px-6 py-6 space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="font-medium text-cf-900">Security Alerts</div>
+                            <div class="text-sm text-cf-500">Get notified when suspicious activity is detected</div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-cf-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                        </label>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="font-medium text-cf-900">Site Status Updates</div>
+                            <div class="text-sm text-cf-500">Notifications about your protected sites</div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-cf-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                        </label>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="font-medium text-cf-900">Weekly Reports</div>
+                            <div class="text-sm text-cf-500">Receive weekly security summaries</div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer">
+                            <div class="w-11 h-6 bg-cf-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Two-Factor Authentication Modal -->
+{% block modals %}
+<div id="twoFactorModal" class="modal-backdrop fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white dark:bg-cf-800 rounded-lg shadow-cf-xl w-full max-w-md mx-4 transition-colors duration-200">
+        <div class="flex items-center justify-between p-6 border-b border-cf-200">
+            <h3 class="text-lg font-semibold text-cf-900">Enable Two-Factor Authentication</h3>
+            <button onclick="closeModal('twoFactorModal')" class="text-cf-400 hover:text-cf-600">
+                <i class="fas fa-times w-5 h-5"></i>
+            </button>
+        </div>
+        <div class="p-6">
+            <p class="text-cf-600 mb-4">Two-factor authentication adds an extra layer of security to your account by requiring a verification code in addition to your password.</p>
+            <div class="space-y-3">
+                <button class="w-full flex items-center justify-center p-3 border border-cf-300 rounded-lg hover:bg-cf-50 transition-colors duration-200">
+                    <i class="fas fa-mobile-alt mr-3 text-cf-400"></i>
+                    Use Authenticator App
+                </button>
+                <button class="w-full flex items-center justify-center p-3 border border-cf-300 rounded-lg hover:bg-cf-50 transition-colors duration-200">
+                    <i class="fas fa-sms mr-3 text-cf-400"></i>
+                    Use SMS
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<script>
+function showTab(tabName) {
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+    });
+    
+    // Remove active class from all tabs
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('border-primary-500', 'text-primary-600');
+        button.classList.add('border-transparent', 'text-cf-500');
+    });
+    
+    // Show selected tab content
+    document.getElementById(tabName + '-content').classList.remove('hidden');
+    
+    // Add active class to selected tab
+    const activeTab = document.getElementById(tabName + '-tab');
+    activeTab.classList.add('border-primary-500', 'text-primary-600');
+    activeTab.classList.remove('border-transparent', 'text-cf-500');
+}
+</script>
+{% endblock %}

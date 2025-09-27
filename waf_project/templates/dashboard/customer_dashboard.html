@@ -1,0 +1,465 @@
+{% extends "dashboard/layout.html" %}
+
+{% block page_title %}Customer Dashboard{% endblock %}
+{% block page_subtitle %}Monitor your protected sites and security metrics{% endblock %}
+
+{% block page_actions %}
+<button onclick="openModal('addSiteModal')" class="bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg text-sm px-4 py-2.5 transition-colors duration-200 flex items-center">
+    <i class="fas fa-plus mr-2"></i>
+    Add Site
+</button>
+<button onclick="openModal('settingsModal')" class="text-cf-700 dark:text-cf-300 bg-white dark:bg-cf-800 border border-cf-300 dark:border-cf-600 hover:bg-cf-50 dark:hover:bg-cf-700 font-medium rounded-lg text-sm px-4 py-2.5 transition-colors duration-200 flex items-center">
+    <i class="fas fa-cog mr-2"></i>
+    Settings
+</button>
+{% endblock %}
+
+{% block dashboard_content %}
+<!-- Quick Stats Section -->
+<div class="mb-8">
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-semibold text-cf-900 flex items-center">
+            <i class="fas fa-chart-bar mr-3 text-primary-600"></i>
+            Your Security Overview
+        </h2>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Total Sites -->
+        <div class="bg-white dark:bg-cf-800 border border-cf-200 dark:border-cf-700 rounded-lg shadow-cf hover:shadow-cf-md transition-all duration-200">
+            <div class="p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-secondary-100 mr-4">
+                        <i class="fas fa-globe text-secondary-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-cf-900">{{ total_sites }}</div>
+                        <div class="text-sm text-cf-600">Protected Sites</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Today's Requests -->
+        <div class="bg-white dark:bg-cf-800 border border-cf-200 dark:border-cf-700 rounded-lg shadow-cf hover:shadow-cf-md transition-all duration-200">
+            <div class="p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100 mr-4">
+                        <i class="fas fa-exchange-alt text-green-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-cf-900">{{ total_requests_today|floatformat:0 }}</div>
+                        <div class="text-sm text-cf-600">Requests Today</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blocked Attacks -->
+        <div class="bg-white dark:bg-cf-800 border border-cf-200 dark:border-cf-700 rounded-lg shadow-cf hover:shadow-cf-md transition-all duration-200">
+            <div class="p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-primary-100 mr-4">
+                        <i class="fas fa-shield-alt text-primary-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-cf-900">{{ blocked_today }}</div>
+                        <div class="text-sm text-cf-600">Threats Blocked</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sites Overview Section -->
+<div class="mb-8">
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-semibold text-cf-900 flex items-center">
+            <i class="fas fa-server mr-3 text-secondary-600"></i>
+            Your Sites
+        </h2>
+        <a href="{% url 'site_list' %}" class="text-cf-700 bg-white border border-cf-300 hover:bg-cf-50 font-medium rounded-lg text-sm px-4 py-2 transition-colors duration-200 flex items-center">
+            <i class="fas fa-list mr-2"></i>
+            View All
+        </a>
+    </div>
+    
+    {% if sites %}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {% for site in sites %}
+                <div class="bg-white dark:bg-cf-800 border border-cf-200 dark:border-cf-700 rounded-lg shadow-cf hover:shadow-cf-md transition-all duration-200">
+                    <div class="p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex-1">
+                                <h4 class="text-lg font-medium text-cf-900 mb-1">{{ site.domain }}</h4>
+                                <p class="text-sm text-cf-600">{{ site.backend_url|truncatechars:40 }}</p>
+                            </div>
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {% if site.is_active %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                {% if site.is_active %}
+                                    <i class="fas fa-check mr-1"></i>Active
+                                {% else %}
+                                    <i class="fas fa-pause mr-1"></i>Inactive
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            <a href="{% url 'site_rules' site.id %}" class="bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg text-sm px-3 py-2 transition-colors duration-200 flex items-center">
+                                <i class="fas fa-shield-virus mr-2"></i>
+                                Rules
+                            </a>
+                            <a href="{% url 'site_stats' site.id %}" class="text-cf-700 bg-white border border-cf-300 hover:bg-cf-50 font-medium rounded-lg text-sm px-3 py-2 transition-colors duration-200 flex items-center">
+                                <i class="fas fa-chart-line mr-2"></i>
+                                Stats
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="bg-white dark:bg-cf-800 border border-cf-200 dark:border-cf-700 rounded-lg shadow-cf transition-colors duration-200">
+            <div class="p-12 text-center">
+                <i class="fas fa-globe text-cf-300 text-5xl mb-4"></i>
+                <h4 class="text-lg font-medium text-cf-900 mb-2">No Sites Protected Yet</h4>
+                <p class="text-cf-600 mb-6">Add your first site to start protecting it with our WAF</p>
+                <button onclick="openModal('addSiteModal')" class="bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg px-6 py-3 transition-colors duration-200 flex items-center mx-auto">
+                    <i class="fas fa-plus mr-2"></i>
+                    Add Your First Site
+                </button>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Analytics Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+    <!-- Traffic Analytics Chart -->
+    <div class="bg-white dark:bg-cf-800 border border-cf-200 dark:border-cf-700 rounded-lg shadow-cf transition-colors duration-200">
+        <div class="px-6 py-4 border-b border-cf-200 dark:border-cf-700">
+            <h3 class="text-lg font-medium text-cf-900 dark:text-white flex items-center">
+                <i class="fas fa-chart-line mr-3 text-blue-600"></i>
+                Traffic Analytics
+            </h3>
+            <p class="text-sm text-cf-600 mt-1">Last 7 days activity</p>
+        </div>
+        <div class="p-6">
+            <canvas id="trafficChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+
+    <!-- Security Events Chart -->
+    <div class="bg-white dark:bg-cf-800 border border-cf-200 dark:border-cf-700 rounded-lg shadow-cf transition-colors duration-200">
+        <div class="px-6 py-4 border-b border-cf-200 dark:border-cf-700">
+            <h3 class="text-lg font-medium text-cf-900 dark:text-white flex items-center">
+                <i class="fas fa-shield-alt mr-3 text-red-600"></i>
+                Security Events
+            </h3>
+            <p class="text-sm text-cf-600 mt-1">Threats vs Clean Traffic</p>
+        </div>
+        <div class="p-6">
+            <canvas id="securityChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Regional Traffic Map -->
+<div class="bg-white dark:bg-cf-800 border border-cf-200 dark:border-cf-700 rounded-lg shadow-cf mb-8 transition-colors duration-200">
+    <div class="px-6 py-4 border-b border-cf-200">
+        <h3 class="text-lg font-medium text-cf-900 flex items-center">
+            <i class="fas fa-globe-americas mr-3 text-green-600"></i>
+            Global Traffic Distribution
+        </h3>
+        <p class="text-sm text-cf-600 mt-1">Request origins by country</p>
+    </div>
+    <div class="p-6">
+        <div id="worldMap" style="height: 400px;"></div>
+        <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="text-center p-3 bg-cf-50 rounded-lg">
+                <div class="text-lg font-bold text-cf-900">45%</div>
+                <div class="text-sm text-cf-600">United States</div>
+            </div>
+            <div class="text-center p-3 bg-cf-50 rounded-lg">
+                <div class="text-lg font-bold text-cf-900">23%</div>
+                <div class="text-sm text-cf-600">Europe</div>
+            </div>
+            <div class="text-center p-3 bg-cf-50 rounded-lg">
+                <div class="text-lg font-bold text-cf-900">18%</div>
+                <div class="text-sm text-cf-600">Asia Pacific</div>
+            </div>
+            <div class="text-center p-3 bg-cf-50 rounded-lg">
+                <div class="text-lg font-bold text-cf-900">14%</div>
+                <div class="text-sm text-cf-600">Other</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity Section -->
+<div class="mb-8">
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-semibold text-cf-900 flex items-center">
+            <i class="fas fa-history mr-3 text-yellow-600"></i>
+            Recent Activity
+        </h2>
+        <a href="{% url 'site_list' %}" class="text-primary-600 hover:text-primary-700 text-sm font-medium">
+            View All Sites <i class="fas fa-arrow-right ml-1"></i>
+        </a>
+    </div>
+    
+    {% if recent_logs %}
+        <div class="bg-white dark:bg-cf-800 border border-cf-200 dark:border-cf-700 rounded-lg shadow-cf transition-colors duration-200">
+            <div class="divide-y divide-cf-200">
+                {% for log in recent_logs|slice:":5" %}
+                    <div class="p-4 hover:bg-cf-50 transition-colors duration-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center {% if log.status == 'BLOCKED' %}bg-red-100{% elif log.status == 'RATE_LIMITED' %}bg-yellow-100{% else %}bg-green-100{% endif %}">
+                                    {% if log.status == 'BLOCKED' %}
+                                        <i class="fas fa-ban text-red-600 text-sm"></i>
+                                    {% elif log.status == 'RATE_LIMITED' %}
+                                        <i class="fas fa-clock text-yellow-600 text-sm"></i>
+                                    {% else %}
+                                        <i class="fas fa-check text-green-600 text-sm"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <div class="font-medium text-cf-900">{{ log.url|truncatechars:60 }}</div>
+                                    <div class="text-sm text-cf-600">
+                                        {{ log.site.domain }} • {{ log.ip_address }} • {{ log.timestamp|timesince }} ago
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {% if log.status == 'BLOCKED' %}bg-red-100 text-red-800{% elif log.status == 'RATE_LIMITED' %}bg-yellow-100 text-yellow-800{% else %}bg-green-100 text-green-800{% endif %}">
+                                {{ log.status }}
+                            </span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div class="bg-white dark:bg-cf-800 border border-cf-200 dark:border-cf-700 rounded-lg shadow-cf transition-colors duration-200">
+            <div class="p-12 text-center">
+                <i class="fas fa-history text-cf-300 text-5xl mb-4"></i>
+                <h4 class="text-lg font-medium text-cf-900 mb-2">No Recent Activity</h4>
+                <p class="text-cf-600">Activity will appear here once your sites start receiving traffic</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block modals %}
+<!-- Add Site Modal -->
+<div id="addSiteModal" class="modal-backdrop fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white dark:bg-cf-800 rounded-lg shadow-cf-xl w-full max-w-md mx-4 transition-colors duration-200">
+        <div class="flex items-center justify-between p-6 border-b border-cf-200 dark:border-cf-700">
+            <h3 class="text-lg font-semibold text-cf-900 dark:text-white">Add New Site</h3>
+            <button onclick="closeModal('addSiteModal')" class="text-cf-400 hover:text-cf-600">
+                <i class="fas fa-times w-5 h-5"></i>
+            </button>
+        </div>
+        <form action="{% url 'site_add' %}" method="post" class="p-6 space-y-4">
+            {% csrf_token %}
+            <div>
+                <label for="domain" class="block text-sm font-medium text-cf-900 mb-2">Domain</label>
+                <input type="text" id="domain" name="domain" class="w-full px-3 py-2 border border-cf-300 rounded-lg focus:ring-primary-500 focus:border-primary-500" placeholder="example.com" required>
+            </div>
+            <div>
+                <label for="backend_url" class="block text-sm font-medium text-cf-900 mb-2">Backend URL</label>
+                <input type="url" id="backend_url" name="backend_url" class="w-full px-3 py-2 border border-cf-300 rounded-lg focus:ring-primary-500 focus:border-primary-500" placeholder="https://backend.example.com" required>
+            </div>
+            <div class="flex items-center justify-end space-x-3 pt-4">
+                <button type="button" onclick="closeModal('addSiteModal')" class="px-4 py-2 text-cf-700 bg-white border border-cf-300 rounded-lg hover:bg-cf-50 transition-colors duration-200">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors duration-200">
+                    Add Site
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div id="settingsModal" class="modal-backdrop fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white dark:bg-cf-800 rounded-lg shadow-cf-xl w-full max-w-lg mx-4 transition-colors duration-200">
+        <div class="flex items-center justify-between p-6 border-b border-cf-200 dark:border-cf-700">
+            <h3 class="text-lg font-semibold text-cf-900 dark:text-white">Quick Settings</h3>
+            <button onclick="closeModal('settingsModal')" class="text-cf-400 hover:text-cf-600">
+                <i class="fas fa-times w-5 h-5"></i>
+            </button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div class="space-y-3">
+                <a href="{% url 'user_settings' %}" class="flex items-center p-3 rounded-lg hover:bg-cf-100 transition-colors duration-200">
+                    <i class="fas fa-cog w-5 h-5 text-cf-400 mr-3"></i>
+                    <div>
+                        <div class="font-medium text-cf-900">Account Settings</div>
+                        <div class="text-sm text-cf-500">Manage your account preferences</div>
+                    </div>
+                </a>
+                <a href="{% url 'profile' %}" class="flex items-center p-3 rounded-lg hover:bg-cf-100 transition-colors duration-200">
+                    <i class="fas fa-user w-5 h-5 text-cf-400 mr-3"></i>
+                    <div>
+                        <div class="font-medium text-cf-900">Profile</div>
+                        <div class="text-sm text-cf-500">Update your personal information</div>
+                    </div>
+                </a>
+                <button class="flex items-center w-full p-3 rounded-lg hover:bg-cf-100 transition-colors duration-200 text-left">
+                    <i class="fas fa-bell w-5 h-5 text-cf-400 mr-3"></i>
+                    <div>
+                        <div class="font-medium text-cf-900">Notifications</div>
+                        <div class="text-sm text-cf-500">Configure alert preferences</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Cloudflare-style color palette
+    const colors = {
+        primary: '#f97316',
+        secondary: '#3b82f6',
+        success: '#10b981',
+        danger: '#ef4444',
+        warning: '#f59e0b',
+        info: '#06b6d4',
+        gray: '#6b7280'
+    };
+
+    // Traffic Analytics Chart
+    const trafficCtx = document.getElementById('trafficChart').getContext('2d');
+    new Chart(trafficCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan 21', 'Jan 22', 'Jan 23', 'Jan 24', 'Jan 25', 'Jan 26', 'Jan 27'],
+            datasets: [{
+                label: 'Total Requests',
+                data: [1200, 1900, 1500, 2100, 1800, 2400, 2200],
+                borderColor: colors.secondary,
+                backgroundColor: colors.secondary + '20',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }, {
+                label: 'Blocked Requests',
+                data: [45, 78, 52, 89, 67, 94, 81],
+                borderColor: colors.danger,
+                backgroundColor: colors.danger + '20',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: '#f1f5f9'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+
+    // Security Events Doughnut Chart
+    const securityCtx = document.getElementById('securityChart').getContext('2d');
+    new Chart(securityCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Clean Traffic', 'SQL Injection', 'XSS Attempts', 'Rate Limited', 'Bot Traffic'],
+            datasets: [{
+                data: [85, 6, 4, 3, 2],
+                backgroundColor: [
+                    colors.success,
+                    colors.danger,
+                    colors.warning,
+                    colors.info,
+                    colors.gray
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15
+                    }
+                }
+            }
+        }
+    });
+
+    // World Map for Regional Traffic
+    const map = new jsVectorMap({
+        selector: '#worldMap',
+        map: 'world',
+        backgroundColor: '#f8fafc',
+        regionStyle: {
+            initial: {
+                fill: '#e2e8f0'
+            },
+            hover: {
+                fill: colors.primary,
+                cursor: 'pointer'
+            }
+        },
+        series: {
+            regions: [{
+                values: {
+                    'US': 45,
+                    'GB': 12,
+                    'DE': 8,
+                    'FR': 6,
+                    'CA': 5,
+                    'AU': 4,
+                    'JP': 3,
+                    'CN': 3,
+                    'BR': 2,
+                    'IN': 2,
+                    'RU': 2,
+                    'IT': 2,
+                    'ES': 2,
+                    'NL': 1,
+                    'SE': 1,
+                    'NO': 1,
+                    'DK': 1
+                },
+                scale: [colors.secondary + '30', colors.secondary],
+                normalizeFunction: 'polynomial'
+            }]
+        },
+        onRegionTooltipShow: function(e, el, code) {
+            const value = el.series.regions[0].values[code] || 0;
+            el.html(el.html() + ' - ' + value + '% of traffic');
+        }
+    });
+});
+</script>

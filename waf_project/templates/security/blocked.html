@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Blocked - WAF Security</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Cloudflare-style Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            300: '#fdba74',
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            800: '#9a3412',
+                            900: '#7c2d12'
+                        },
+                        cf: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .security-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        .shield-glow {
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+            }
+            to {
+                box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
+            }
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
+        }
+    </style>
+</head>
+
+<body class="gradient-bg min-h-screen flex items-center justify-center p-4">
+    <!-- Security Alert Container -->
+    <div class="max-w-2xl mx-auto">
+        <!-- Main Alert Card -->
+        <div class="bg-white rounded-2xl shadow-2xl border border-cf-200 overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-red-500 to-red-600 px-8 py-6 text-center">
+                <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shield-glow">
+                    <i class="fas fa-shield-alt text-red-500 text-3xl security-animation"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-white mb-2">Request Blocked</h1>
+                <p class="text-red-100">Your request has been blocked by our security system</p>
+            </div>
+            
+            <!-- Content -->
+            <div class="px-8 py-8">
+                <div class="text-center mb-8">
+                    <h2 class="text-xl font-semibold text-cf-900 mb-3">Why was my request blocked?</h2>
+                    <p class="text-cf-600 leading-relaxed">
+                        Our Web Application Firewall detected suspicious activity in your request that matches known attack patterns. 
+                        This security measure helps protect the website and its users from potential threats.
+                    </p>
+                </div>
+                
+                <!-- Security Details -->
+                <div class="bg-cf-50 border border-cf-200 rounded-lg p-6 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <span class="font-medium text-cf-700">Block Time:</span>
+                            <span class="text-cf-600 ml-2">{{ timestamp|date:"M d, Y H:i:s" }}</span>
+                        </div>
+                        <div>
+                            <span class="font-medium text-cf-700">Request ID:</span>
+                            <span class="text-cf-600 ml-2 font-mono">{{ request_id|default:"N/A" }}</span>
+                        </div>
+                        <div>
+                            <span class="font-medium text-cf-700">Your IP:</span>
+                            <span class="text-cf-600 ml-2 font-mono">{{ client_ip|default:"Unknown" }}</span>
+                        </div>
+                        <div>
+                            <span class="font-medium text-cf-700">Rule Triggered:</span>
+                            <span class="text-cf-600 ml-2">{{ rule_name|default:"Security Policy" }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Common Reasons -->
+                <div class="mb-8">
+                    <h3 class="font-semibold text-cf-900 mb-4">Common reasons for blocking:</h3>
+                    <ul class="space-y-2 text-cf-600">
+                        <li class="flex items-start">
+                            <i class="fas fa-database text-red-500 mr-3 mt-1"></i>
+                            <span>SQL injection attempts in form data or URLs</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-code text-yellow-500 mr-3 mt-1"></i>
+                            <span>Cross-site scripting (XSS) patterns detected</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-folder-open text-blue-500 mr-3 mt-1"></i>
+                            <span>Path traversal attempts</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-robot text-purple-500 mr-3 mt-1"></i>
+                            <span>Automated bot or crawler activity</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-tachometer-alt text-orange-500 mr-3 mt-1"></i>
+                            <span>Rate limiting due to too many requests</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Actions -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button onclick="history.back()" class="bg-cf-600 hover:bg-cf-700 text-white font-medium rounded-lg px-6 py-3 transition-colors duration-200 flex items-center justify-center">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Go Back
+                    </button>
+                    <button onclick="window.location.reload()" class="text-cf-700 bg-white border border-cf-300 hover:bg-cf-50 font-medium rounded-lg px-6 py-3 transition-colors duration-200 flex items-center justify-center">
+                        <i class="fas fa-redo mr-2"></i>
+                        Try Again
+                    </button>
+                    <button onclick="reportIssue()" class="text-primary-700 bg-primary-50 border border-primary-200 hover:bg-primary-100 font-medium rounded-lg px-6 py-3 transition-colors duration-200 flex items-center justify-center">
+                        <i class="fas fa-flag mr-2"></i>
+                        Report Issue
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="bg-cf-50 px-8 py-4 border-t border-cf-200">
+                <div class="flex items-center justify-center text-sm text-cf-500">
+                    <i class="fas fa-shield-alt mr-2"></i>
+                    Protected by WAF Security System
+                </div>
+            </div>
+        </div>
+        
+        <!-- Additional Info -->
+        <div class="mt-6 text-center">
+            <p class="text-cf-300 text-sm">
+                If you believe this is an error, please contact the website administrator.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function reportIssue() {
+            alert('Thank you for reporting this issue. The website administrator has been notified.');
+        }
+        
+        // Auto-hide after 30 seconds (optional)
+        // setTimeout(() => {
+        //     window.history.back();
+        // }, 30000);
+    </script>
+</body>
+</html>
