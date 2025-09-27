@@ -31,10 +31,10 @@ def login_view(request):
             # Basic validation - in real implementation, you'd store the expected answer in session
             if captcha_value < 2 or captcha_value > 20:  # Basic range check
                 messages.error(request, 'Please complete the CAPTCHA correctly')
-                return render(request, 'accounts/login.html')
+                return render(request, 'waf_proxy/login.html')
         except (ValueError, TypeError):
             messages.error(request, 'Please complete the CAPTCHA correctly')
-            return render(request, 'accounts/login.html')
+            return render(request, 'waf_proxy/login.html')
         
         # Use Django's authenticate function with email as username
         user = authenticate(request, username=email, password=password)
@@ -42,7 +42,7 @@ def login_view(request):
         if user:
             if not user.is_email_verified:
                 messages.error(request, 'Please verify your email address before signing in')
-                return render(request, 'accounts/login.html')
+                return render(request, 'waf_proxy/login.html')
             
             login(request, user)
             user.last_login = timezone.now()
@@ -57,7 +57,7 @@ def login_view(request):
         else:
             messages.error(request, 'Invalid email or password')
     
-    return render(request, 'accounts/login.html')
+    return render(request, 'waf_proxy/login.html')
 
 def logout_view(request):
     logout(request)
@@ -103,12 +103,12 @@ def customer_dashboard(request):
         'blocked_today': blocked_today,
         'recent_logs': recent_logs,
     }
-    return render(request, 'web_sites/dashboard.html', context)
+    return render(request, 'waf_proxy/customer/dashboard.html', context)
 
 @customer_required
 def site_list(request):
     sites = Site.objects.filter(owner=request.user).order_by('-created_at')
-    return render(request, 'web_sites/site_list.html', {'sites': sites})
+    return render(request, 'waf_proxy/customer/site_list.html', {'sites': sites})
 
 @customer_required
 def site_add(request):
@@ -121,12 +121,12 @@ def site_add(request):
         # Basic validation
         if not all([name, domain, backend_url]):
             messages.error(request, 'Please fill in all required fields')
-            return render(request, 'web_sites/site_add.html')
+            return render(request, 'waf_proxy/customer/site_add.html')
         
         # Check if domain already exists
         if Site.objects.filter(domain=domain).exists():
             messages.error(request, 'A site with this domain already exists')
-            return render(request, 'web_sites/site_add.html')
+            return render(request, 'waf_proxy/customer/site_add.html')
         
         try:
             site = Site.objects.create(
@@ -143,7 +143,7 @@ def site_add(request):
         except Exception as e:
             messages.error(request, f'Failed to create site: {str(e)}')
     
-    return render(request, 'web_sites/site_add.html')
+    return render(request, 'waf_proxy/customer/site_add.html')
 
 @site_owner_required
 def site_detail(request, site_id):
@@ -171,7 +171,7 @@ def site_detail(request, site_id):
         'blocked_requests': blocked_requests,
         'active_rules_count': active_rules_count,
     }
-    return render(request, 'web_sites/site_detail.html', context)
+    return render(request, 'waf_proxy/customer/site_detail.html', context)
 
 @site_owner_required
 def site_edit(request, site_id):
@@ -195,7 +195,7 @@ def site_edit(request, site_id):
         except Exception as e:
             messages.error(request, f'Failed to update site: {str(e)}')
     
-    return render(request, 'web_sites/site_edit.html', {'site': site})
+    return render(request, 'waf_proxy/customer/site_edit.html', {'site': site})
 
 @site_owner_required
 def site_delete(request, site_id):
@@ -211,7 +211,7 @@ def site_delete(request, site_id):
         messages.success(request, f'Site "{site_name}" deleted successfully!')
         return redirect('site_list')
     
-    return render(request, 'web_sites/site_delete.html', {'site': site})
+    return render(request, 'waf_proxy/customer/site_delete.html', {'site': site})
 
 @site_owner_required
 def site_rules(request, site_id):
@@ -257,7 +257,7 @@ def site_rules(request, site_id):
         'active_rules': active_rules,
         'available_rules': available_rules,
     }
-    return render(request, 'web_sites/site_rules.html', context)
+    return render(request, 'waf_proxy/customer/site_rules.html', context)
 
 @site_owner_required
 def site_rule_add(request, site_id):
@@ -277,7 +277,7 @@ def site_rule_add(request, site_id):
         
         if not all([rule_name, rule_pattern, rule_type, rule_action]):
             messages.error(request, 'Please fill in all required fields')
-            return render(request, 'web_sites/site_rule_add.html', {'site': site})
+            return render(request, 'waf_proxy/customer/site_rule_add.html', {'site': site})
         
         try:
             # Create custom rule for this site
@@ -333,7 +333,7 @@ def site_rule_add(request, site_id):
         'rule_types': Rule.RULE_TYPE_CHOICES,
         'actions': Rule.ACTION_CHOICES,
     }
-    return render(request, 'web_sites/site_rule_add.html', context)
+    return render(request, 'waf_proxy/customer/site_rule_add.html', context)
 
 @site_owner_required
 def site_rule_edit(request, site_id, rule_id):
@@ -369,7 +369,7 @@ def site_rule_edit(request, site_id, rule_id):
         'rule_types': Rule.RULE_TYPE_CHOICES,
         'actions': Rule.ACTION_CHOICES,
     }
-    return render(request, 'web_sites/site_rule_edit.html', context)
+    return render(request, 'waf_proxy/customer/site_rule_edit.html', context)
 
 @site_owner_required
 def site_rule_delete(request, site_id, rule_id):
@@ -398,7 +398,7 @@ def site_rule_delete(request, site_id, rule_id):
         'site': site,
         'site_rule': site_rule,
     }
-    return render(request, 'web_sites/site_rule_delete.html', context)
+    return render(request, 'waf_proxy/customer/site_rule_delete.html', context)
 
 @site_owner_required
 def site_rules_import(request, site_id):
@@ -485,7 +485,7 @@ def site_rules_import(request, site_id):
         'site': site,
         'other_sites': other_sites,
     }
-    return render(request, 'web_sites/site_rules_import.html', context)
+    return render(request, 'waf_proxy/customer/site_rules_import.html', context)
 
 @site_owner_required
 def site_rules_export(request, site_id):
@@ -548,7 +548,7 @@ def site_stats(request, site_id):
         'stats': stats,
         'recent_logs': recent_logs,
     }
-    return render(request, 'web_sites/site_stats.html', context)
+    return render(request, 'waf_proxy/customer/site_stats.html', context)
 
 # Admin Views
 @admin_required
@@ -581,7 +581,7 @@ def admin_dashboard(request):
         'top_blocked_rules': top_blocked_rules,
         'recent_logs': recent_logs,
     }
-    return render(request, 'admin_panel/dashboard.html', context)
+    return render(request, 'waf_proxy/admin/dashboard.html', context)
 
 @admin_required
 def customer_list(request):
@@ -590,7 +590,7 @@ def customer_list(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    return render(request, 'admin_panel/customer_list.html', {'page_obj': page_obj})
+    return render(request, 'waf_proxy/admin/customer_list.html', {'page_obj': page_obj})
 
 @admin_required
 def admin_site_list(request):
@@ -599,12 +599,12 @@ def admin_site_list(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    return render(request, 'admin_panel/site_list.html', {'page_obj': page_obj})
+    return render(request, 'waf_proxy/admin/site_list.html', {'page_obj': page_obj})
 
 @admin_required
 def rule_list(request):
     rules = Rule.objects.order_by('-created_at')
-    return render(request, 'admin_panel/rule_list.html', {'rules': rules})
+    return render(request, 'waf_proxy/admin/rule_list.html', {'rules': rules})
 
 @admin_required
 def log_list(request):
@@ -649,17 +649,17 @@ def log_list(request):
         'domain_filter': domain_filter,
     }
     
-    return render(request, 'admin_panel/log_list.html', context)
+    return render(request, 'waf_proxy/admin/log_list.html', context)
 
 # Chart test view
 def chart_test(request):
-    return render(request, 'core/chart_test.html')
+    return render(request, 'waf_proxy/chart_test.html')
 
 # Test view to demonstrate WAF protection
 # Profile and Settings Views
 @login_required_custom
 def profile(request):
-    return render(request, 'accounts/profile.html', {'user': request.user})
+    return render(request, 'waf_proxy/profile.html', {'user': request.user})
 
 @login_required_custom
 def user_settings(request):
@@ -678,15 +678,15 @@ def user_settings(request):
         if current_password and new_password:
             if not request.user.check_password(current_password):
                 messages.error(request, 'Current password is incorrect')
-                return render(request, 'accounts/settings.html')
+                return render(request, 'waf_proxy/settings.html')
             
             if new_password != confirm_password:
                 messages.error(request, 'New passwords do not match')
-                return render(request, 'accounts/settings.html')
+                return render(request, 'waf_proxy/settings.html')
             
             if len(new_password) < 8:
                 messages.error(request, 'Password must be at least 8 characters long')
-                return render(request, 'accounts/settings.html')
+                return render(request, 'waf_proxy/settings.html')
             
             request.user.set_password(new_password)
             messages.success(request, 'Password updated successfully! Please log in again.')
@@ -698,7 +698,7 @@ def user_settings(request):
         except Exception as e:
             messages.error(request, f'Failed to update settings: {str(e)}')
     
-    return render(request, 'accounts/settings.html')
+    return render(request, 'waf_proxy/settings.html')
 
 # Admin Management Views
 @admin_required
@@ -720,7 +720,7 @@ def customer_detail(request, customer_id):
         'total_requests': total_requests,
         'blocked_requests': blocked_requests,
     }
-    return render(request, 'admin_panel/customer_detail.html', context)
+    return render(request, 'waf_proxy/admin/customer_detail.html', context)
 
 @admin_required
 def rule_add(request):
@@ -734,7 +734,7 @@ def rule_add(request):
         
         if not all([name, pattern, rule_type, action]):
             messages.error(request, 'Please fill in all required fields')
-            return render(request, 'admin_panel/rule_add.html')
+            return render(request, 'waf_proxy/admin/rule_add.html')
         
         try:
             rule = Rule.objects.create(
@@ -751,7 +751,7 @@ def rule_add(request):
         except Exception as e:
             messages.error(request, f'Failed to create rule: {str(e)}')
     
-    return render(request, 'admin_panel/rule_add.html')
+    return render(request, 'waf_proxy/admin/rule_add.html')
 
 @admin_required
 def rule_edit(request, rule_id):
@@ -777,7 +777,7 @@ def rule_edit(request, rule_id):
         except Exception as e:
             messages.error(request, f'Failed to update rule: {str(e)}')
     
-    return render(request, 'admin_panel/rule_edit.html', {'rule': rule})
+    return render(request, 'waf_proxy/admin/rule_edit.html', {'rule': rule})
 
 @admin_required
 def rule_delete(request, rule_id):
@@ -793,7 +793,7 @@ def rule_delete(request, rule_id):
         messages.success(request, f'Rule "{rule_name}" deleted successfully!')
         return redirect('rule_list')
     
-    return render(request, 'admin_panel/rule_delete.html', {'rule': rule})
+    return render(request, 'waf_proxy/admin/rule_delete.html', {'rule': rule})
 
 @admin_required
 def system_status(request):
@@ -876,11 +876,11 @@ def system_status(request):
         'threats_blocked': threats_blocked,
         'avg_response_time': avg_response_time,
     }
-    return render(request, 'admin_panel/system_status.html', context)
+    return render(request, 'waf_proxy/admin/system_status.html', context)
 
 # API Documentation
 def api_docs(request):
-    return render(request, 'core/api_docs.html')
+    return render(request, 'waf_proxy/api_docs.html')
 
 # WAF Security Views
 def blocked_request(request):
@@ -908,7 +908,7 @@ def blocked_request(request):
     }
     
     # Return blocked page with 403 status
-    response = render(request, 'security/blocked.html', context)
+    response = render(request, 'waf_proxy/blocked.html', context)
     response.status_code = 403
     return response
 
@@ -919,7 +919,7 @@ def access_denied(request):
         'error_title': 'Access Denied',
         'error_message': 'You do not have permission to access this resource.',
     }
-    response = render(request, 'errors/error.html', context)
+    response = render(request, 'waf_proxy/error.html', context)
     response.status_code = 403
     return response
 
@@ -931,7 +931,7 @@ def rate_limited(request):
         'error_message': 'You have exceeded the rate limit. Please wait before trying again.',
         'retry_after': '60', # seconds
     }
-    response = render(request, 'errors/error.html', context)
+    response = render(request, 'waf_proxy/error.html', context)
     response.status_code = 429
     return response
 
@@ -1114,32 +1114,32 @@ def register_view(request):
             captcha_value = int(captcha_answer) if captcha_answer else 0
             if captcha_value < 2 or captcha_value > 20:  # Basic range check
                 messages.error(request, 'Please complete the CAPTCHA correctly')
-                return render(request, 'accounts/register.html')
+                return render(request, 'waf_proxy/auth/register.html')
         except (ValueError, TypeError):
             messages.error(request, 'Please complete the CAPTCHA correctly')
-            return render(request, 'accounts/register.html')
+            return render(request, 'waf_proxy/auth/register.html')
         
         # Basic validation
         if not all([email, password, password_confirm, first_name, last_name]):
             messages.error(request, 'Please fill in all required fields')
-            return render(request, 'accounts/register.html')
+            return render(request, 'waf_proxy/auth/register.html')
         
         if password != password_confirm:
             messages.error(request, 'Passwords do not match')
-            return render(request, 'accounts/register.html')
+            return render(request, 'waf_proxy/auth/register.html')
         
         if len(password) < 8:
             messages.error(request, 'Password must be at least 8 characters long')
-            return render(request, 'accounts/register.html')
+            return render(request, 'waf_proxy/auth/register.html')
         
         if not agree_terms:
             messages.error(request, 'Please agree to the Terms of Service')
-            return render(request, 'accounts/register.html')
+            return render(request, 'waf_proxy/auth/register.html')
         
         # Check if user already exists
         if User.objects.filter(email=email).exists():
             messages.error(request, 'An account with this email already exists')
-            return render(request, 'accounts/register.html')
+            return render(request, 'waf_proxy/auth/register.html')
         
         # Create user
         try:
@@ -1158,16 +1158,16 @@ def register_view(request):
             # Send verification email
             if send_verification_email(user):
                 messages.success(request, 'Registration successful! Please check your email to verify your account.')
-                return render(request, 'accounts/email_sent.html', {'email': email})
+                return render(request, 'waf_proxy/auth/email_sent.html', {'email': email})
             else:
                 messages.error(request, 'Registration successful, but we could not send the verification email. Please contact support.')
-                return render(request, 'accounts/email_sent.html', {'email': email})
+                return render(request, 'waf_proxy/auth/email_sent.html', {'email': email})
                 
         except Exception as e:
             messages.error(request, f'Registration failed: {str(e)}')
-            return render(request, 'accounts/register.html')
+            return render(request, 'waf_proxy/auth/register.html')
     
-    return render(request, 'accounts/register.html')
+    return render(request, 'waf_proxy/auth/register.html')
 
 def verify_email(request, token):
     try:
@@ -1191,7 +1191,7 @@ def verify_email(request, token):
         send_welcome_email(user)
         
         messages.success(request, 'Email verified successfully! Your account is now active.')
-        return render(request, 'accounts/email_verified.html', {'user': user})
+        return render(request, 'waf_proxy/auth/email_verified.html', {'user': user})
         
     except EmailVerificationToken.DoesNotExist:
         messages.error(request, 'Invalid or expired verification link.')
@@ -1208,7 +1208,7 @@ def resend_verification(request):
             # Send new verification email (with built-in rate limiting)
             if send_verification_email(user):
                 messages.success(request, 'Verification email sent successfully!')
-                return render(request, 'accounts/email_sent.html', {'email': email})
+                return render(request, 'waf_proxy/auth/email_sent.html', {'email': email})
             else:
                 # Check if it's due to rate limiting
                 from django.utils import timezone
@@ -1223,7 +1223,7 @@ def resend_verification(request):
                 else:
                     messages.error(request, 'Failed to send verification email. Please try again later.')
                 
-                return render(request, 'accounts/email_sent.html', {'email': email})
+                return render(request, 'waf_proxy/auth/email_sent.html', {'email': email})
                 
         except User.DoesNotExist:
             messages.error(request, 'No unverified account found with this email address.')
@@ -1252,7 +1252,7 @@ def forgot_password(request):
             else:
                 messages.error(request, 'Failed to send reset email. Please try again.')
                 
-            return render(request, 'accounts/email_sent.html', {
+            return render(request, 'waf_proxy/auth/email_sent.html', {
                 'email': email,
                 'reset_email': True
             })
@@ -1260,12 +1260,12 @@ def forgot_password(request):
         except User.DoesNotExist:
             # Don't reveal if email exists or not for security
             messages.success(request, 'If an account with this email exists, you will receive a password reset link.')
-            return render(request, 'accounts/email_sent.html', {
+            return render(request, 'waf_proxy/auth/email_sent.html', {
                 'email': email,
                 'reset_email': True
             })
     
-    return render(request, 'accounts/forgot_password.html')
+    return render(request, 'waf_proxy/auth/forgot_password.html')
 
 @csrf_protect
 def reset_password(request, token):
@@ -1284,15 +1284,15 @@ def reset_password(request, token):
             
             if not password or not password_confirm:
                 messages.error(request, 'Please fill in all fields')
-                return render(request, 'accounts/reset_password.html', {'user': user})
+                return render(request, 'waf_proxy/auth/reset_password.html', {'user': user})
             
             if password != password_confirm:
                 messages.error(request, 'Passwords do not match')
-                return render(request, 'accounts/reset_password.html', {'user': user})
+                return render(request, 'waf_proxy/auth/reset_password.html', {'user': user})
             
             if len(password) < 8:
                 messages.error(request, 'Password must be at least 8 characters long')
-                return render(request, 'accounts/reset_password.html', {'user': user})
+                return render(request, 'waf_proxy/auth/reset_password.html', {'user': user})
             
             # Update password
             user.set_password(password)
@@ -1305,7 +1305,7 @@ def reset_password(request, token):
             messages.success(request, 'Password reset successfully! You can now sign in with your new password.')
             return redirect('login')
         
-        return render(request, 'accounts/reset_password.html', {'user': user})
+        return render(request, 'waf_proxy/auth/reset_password.html', {'user': user})
         
     except PasswordResetToken.DoesNotExist:
         messages.error(request, 'Invalid or expired password reset link.')

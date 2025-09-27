@@ -18,67 +18,31 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from waf_proxy import views
 
 urlpatterns = [
-    # Authentication
-    path('', views.dashboard, name='dashboard'),
-    path('login/', views.login_view, name='login'),
-    path('logout/', views.logout_view, name='logout'),
-    path('register/', views.register_view, name='register'),
-    path('forgot-password/', views.forgot_password, name='forgot_password'),
-    path('reset-password/<str:token>/', views.reset_password, name='reset_password'),
-    path('verify-email/<str:token>/', views.verify_email, name='verify_email'),
-    path('resend-verification/', views.resend_verification, name='resend_verification'),
+    # Root dashboard
+    path('', include('dashboard.urls')),
     
-    # OAuth URLs
+    # Authentication and user management
+    path('auth/', include('accounts.urls')),
+    
+    # Site management
+    path('sites/', include('web_sites.urls')),
+    
+    # Security pages
+    path('security/', include('security.urls')),
+    
+    # Admin panel
+    path('admin/', include('admin_panel.urls')),
+    
+    # Core utilities
+    path('', include('core.urls')),
+    
+    # OAuth URLs (django-allauth)
     path('accounts/', include('allauth.urls')),
     
-    # Customer views
-    path('customer/', views.customer_dashboard, name='customer_dashboard'),
-    path('sites/', views.site_list, name='site_list'),
-    path('sites/add/', views.site_add, name='site_add'),
-    path('sites/<int:site_id>/', views.site_detail, name='site_detail'),
-    path('sites/<int:site_id>/edit/', views.site_edit, name='site_edit'),
-    path('sites/<int:site_id>/delete/', views.site_delete, name='site_delete'),
-    path('sites/<int:site_id>/rules/', views.site_rules, name='site_rules'),
-    path('sites/<int:site_id>/rules/add/', views.site_rule_add, name='site_rule_add'),
-    path('sites/<int:site_id>/rules/<int:rule_id>/edit/', views.site_rule_edit, name='site_rule_edit'),
-    path('sites/<int:site_id>/rules/<int:rule_id>/delete/', views.site_rule_delete, name='site_rule_delete'),
-    path('sites/<int:site_id>/rules/import/', views.site_rules_import, name='site_rules_import'),
-    path('sites/<int:site_id>/rules/export/', views.site_rules_export, name='site_rules_export'),
-    path('sites/<int:site_id>/stats/', views.site_stats, name='site_stats'),
-    path('profile/', views.profile, name='profile'),
-    path('settings/', views.user_settings, name='user_settings'),
-    
-    # Custom Admin views (MUST come before Django admin to avoid conflicts)
-    path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
-    path('admin/customers/', views.customer_list, name='customer_list'),
-    path('admin/customers/<int:customer_id>/', views.customer_detail, name='customer_detail'),
-    path('admin/sites/', views.admin_site_list, name='admin_site_list'),
-    path('admin/rules/', views.rule_list, name='rule_list'),
-    path('admin/rules/add/', views.rule_add, name='rule_add'),
-    path('admin/rules/<int:rule_id>/edit/', views.rule_edit, name='rule_edit'),
-    path('admin/rules/<int:rule_id>/delete/', views.rule_delete, name='rule_delete'),
-    path('admin/logs/', views.log_list, name='log_list'),
-    path('admin/system/', views.system_status, name='system_status'),
-    
-    # API Documentation
-    path('api/docs/', views.api_docs, name='api_docs'),
-    
-    # WAF Security Pages
-    path('blocked/', views.blocked_request, name='blocked_request'),
-    path('access-denied/', views.access_denied, name='access_denied'),
-    path('rate-limited/', views.rate_limited, name='rate_limited'),
-    
     # Django built-in admin (MUST come after custom admin routes)
-    path('admin/', admin.site.urls),
-    
-    # Test route for WAF demonstration
-    path('test/', views.test_protected_site, name='test_protected_site'),
-    
-    # Chart test route
-    path('chart-test/', views.chart_test, name='chart_test'),
+    path('django-admin/', admin.site.urls),
 ]
 
 # Serve static files during development

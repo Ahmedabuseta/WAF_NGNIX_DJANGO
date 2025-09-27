@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'dashboard',
     'admin_panel',
     
-    # Legacy app (to be removed after migration)
+    # Legacy app (for backward compatibility)
     'waf_proxy',
     
     'django.contrib.sites',
