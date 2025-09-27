@@ -1,0 +1,73 @@
+{% extends "waf_proxy/base.html" %}
+
+{% block title %}Chart Test{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-cf-50 py-8">
+    <div class="max-w-4xl mx-auto px-4">
+        <h1 class="text-3xl font-bold text-cf-900 mb-8">Chart.js Test Page</h1>
+        
+        <div class="bg-white rounded-lg shadow-cf p-6 mb-8">
+            <h2 class="text-xl font-semibold text-cf-900 mb-4">Simple Test Chart</h2>
+            <div class="h-64">
+                <canvas id="testChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-cf p-6">
+            <h2 class="text-xl font-semibold text-cf-900 mb-4">Chart Status</h2>
+            <div id="chartStatus" class="text-cf-600">
+                Checking Chart.js status...
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const statusDiv = document.getElementById('chartStatus');
+    
+    // Check if Chart.js is loaded
+    if (typeof Chart === 'undefined') {
+        statusDiv.innerHTML = '<span class="text-red-600">❌ Chart.js is not loaded</span>';
+        return;
+    }
+    
+    statusDiv.innerHTML = '<span class="text-green-600">✅ Chart.js is loaded successfully</span>';
+    
+    // Create test chart
+    const ctx = document.getElementById('testChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Test Data',
+                data: [12, 19, 3, 5, 2, 3],
+                borderColor: '#f38020',
+                backgroundColor: '#f38020',
+                borderWidth: 2,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Chart.js Test - Cloudflare Orange Theme'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    
+    statusDiv.innerHTML += '<br><span class="text-green-600">✅ Test chart created successfully</span>';
+});
+</script>
+{% endblock %}

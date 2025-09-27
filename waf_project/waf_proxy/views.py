@@ -651,6 +651,10 @@ def log_list(request):
     
     return render(request, 'waf_proxy/admin/log_list.html', context)
 
+# Chart test view
+def chart_test(request):
+    return render(request, 'waf_proxy/chart_test.html')
+
 # Test view to demonstrate WAF protection
 # Profile and Settings Views
 @login_required_custom

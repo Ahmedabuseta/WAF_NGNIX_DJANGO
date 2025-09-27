@@ -76,6 +76,9 @@ urlpatterns = [
     
     # Test route for WAF demonstration
     path('test/', views.test_protected_site, name='test_protected_site'),
+    
+    # Chart test route
+    path('chart-test/', views.chart_test, name='chart_test'),
 ]
 
 # Serve static files during development
