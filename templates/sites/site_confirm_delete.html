@@ -1,0 +1,26 @@
+{% extends 'ui/base.html' %}
+
+{% block page_title %}Delete Site{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow sm:rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+          <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Delete Site</h3>
+          <div class="mt-2 max-w-xl text-sm text-gray-500">
+            <p>Are you sure you want to delete <strong>{{ object.name }}</strong> ({{ object.domain }})?</p>
+            <p class="mt-2">This action cannot be undone. All associated rules and logs will also be removed.</p>
+          </div>
+          <form method="post" class="mt-5">
+            {% csrf_token %}
+            <div class="flex justify-end space-x-3">
+              <a href="{% url 'sites:detail' object.pk %}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+                Cancel
+              </a>
+              <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                Delete Site
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+{% endblock %}

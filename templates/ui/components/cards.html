@@ -1,0 +1,46 @@
+<!-- Metric Card Component -->
+{% load ui_tags %}
+
+<div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium uppercase leading-tight">{{ title }}</h3>
+            <p class="text-3xl font-bold text-gray-900 dark:text-white mt-1">{{ value }}</p>
+            {% if subtitle %}
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ subtitle }}</p>
+            {% endif %}
+        </div>
+        <div class="text-{{ color|default:'blue' }}-500 dark:text-{{ color|default:'blue' }}-400">
+            {% if icon %}
+                {{ icon|safe }}
+            {% else %}
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+            {% endif %}
+        </div>
+    </div>
+    {% if trend %}
+    <div class="mt-4">
+        <div class="flex items-center">
+            {% if trend.direction == 'up' %}
+            <svg class="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l9.2-9.2M17 17V7H7"></path>
+            </svg>
+            <span class="text-green-500 text-sm font-medium ml-1">{{ trend.value }}%</span>
+            {% elif trend.direction == 'down' %}
+            <svg class="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 7l-9.2 9.2M7 7v10h10"></path>
+            </svg>
+            <span class="text-red-500 text-sm font-medium ml-1">{{ trend.value }}%</span>
+            {% else %}
+            <svg class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+            </svg>
+            <span class="text-gray-500 text-sm font-medium ml-1">{{ trend.value }}%</span>
+            {% endif %}
+            <span class="text-gray-500 dark:text-gray-400 text-sm ml-2">{{ trend.period }}</span>
+        </div>
+    </div>
+    {% endif %}
+</div>

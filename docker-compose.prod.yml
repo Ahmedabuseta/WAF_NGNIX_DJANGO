@@ -1,0 +1,257 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-waf_db}
+      POSTGRES_USER: ${POSTGRES_USER:-waf_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-waf_user} -d ${POSTGRES_DB:-waf_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - waf_network
+
+  # Redis Cache & Message Broker
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a ${REDIS_PASSWORD} ping | grep PONG"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - waf_network
+
+  # Elasticsearch for Logging & Analytics
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - waf_network
+
+  # Kibana for Log Visualization & Analytics
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - SERVER_NAME=waf-kibana
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=5601
+      - SERVER_PUBLICBASEURL=${KIBANA_PUBLIC_URL:-http://localhost:5601}
+      - ELASTICSEARCH_REQUESTTIMEOUT=30000
+      - XPACK_SECURITY_ENABLED=false
+      - TELEMETRY_ENABLED=false
+    volumes:
+      - ./kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+      - kibana_data:/usr/share/kibana/data
+    ports:
+      - "5601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5601/api/status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - waf_network
+
+  # Caddy L7 Proxy (SSL Termination + Auth)
+  caddy-l7:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./docker/caddy/caddy_data:/data
+      - ./docker/caddy/caddy_config:/config
+    depends_on:
+      - django
+    restart: unless-stopped
+    networks:
+      - waf_network
+
+  # Caddy L4 Proxy (TCP Forwarding)
+  caddy-l4:
+    image: caddy:2-alpine
+    command: caddy run --config /etc/caddy/Caddyfile-l4 --adapter caddyfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./Caddyfile-l4:/etc/caddy/Caddyfile-l4
+      - ./docker/caddy/caddy_data:/data
+    depends_on:
+      - django
+    restart: unless-stopped
+    networks:
+      - waf_network
+
+  # Django Application
+  django:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn --bind 0.0.0.0:8000 --workers 4 --timeout 120 flowbiteapp.wsgi:application"
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
+    env_file:
+      - .env
+    environment:
+      - DEBUG=0
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-waf_user}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-waf_db}
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - ELASTICSEARCH_DSL={"default":{"hosts":"elasticsearch:9200"}}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - waf_network
+
+  # Celery Worker
+  celery:
+    build: .
+    command: celery -A flowbiteapp worker -l info --concurrency=4
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
+    env_file:
+      - .env
+    environment:
+      - DEBUG=0
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-waf_user}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-waf_db}
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - ELASTICSEARCH_DSL={"default":{"hosts":"elasticsearch:9200"}}
+    depends_on:
+      - db
+      - redis
+      - elasticsearch
+    restart: unless-stopped
+    networks:
+      - waf_network
+
+  # Celery Beat (Scheduler)
+  celery-beat:
+    build: .
+    command: celery -A flowbiteapp beat -l info
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
+    env_file:
+      - .env
+    environment:
+      - DEBUG=0
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-waf_user}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-waf_db}
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+    networks:
+      - waf_network
+
+  
+
+  # Flower (Celery Monitoring)
+  flower:
+    build: .
+    command: celery -A flowbiteapp flower --port=5555
+    ports:
+      - "5555:5555"
+    environment:
+      - CELERY_BROKER_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - waf_network
+
+  # Prometheus (Monitoring)
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    networks:
+      - waf_network
+
+  # Grafana (Monitoring Dashboard)
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - waf_network
+
+volumes:
+  postgres_data:
+  redis_data:
+  elasticsearch_data:
+  kibana_data:
+  static_volume:
+  media_volume:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  waf_network:
+    driver: bridge

@@ -1,0 +1,133 @@
+{% extends 'ui/base.html' %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+    <div class="flex items-center justify-between">
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Sites</h3>
+        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ total_sites|default:0 }}</p>
+        <p class="text-sm text-green-600 dark:text-green-400">{{ active_sites|default:0 }} active</p>
+      </div>
+      <div class="text-blue-500 dark:text-blue-400">
+        <i class="fas fa-globe text-2xl"></i>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+    <div class="flex items-center justify-between">
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Rules</h3>
+        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ total_rules|default:0 }}</p>
+        <p class="text-sm text-green-600 dark:text-green-400">{{ enabled_rules|default:0 }} enabled</p>
+      </div>
+      <div class="text-purple-500 dark:text-purple-400">
+        <i class="fas fa-shield-alt text-2xl"></i>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+    <div class="flex items-center justify-between">
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Requests (24h)</h3>
+        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ total_requests_24h|default:0 }}</p>
+        <p class="text-sm text-green-600 dark:text-green-400">{{ allows_24h|default:0 }} allowed</p>
+      </div>
+      <div class="text-green-500 dark:text-green-400">
+        <i class="fas fa-chart-line text-2xl"></i>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+    <div class="flex items-center justify-between">
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Blocks (24h)</h3>
+        <p class="text-2xl font-bold text-red-600 dark:text-red-400">{{ blocked_requests_24h|default:0 }}</p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">threats blocked</p>
+      </div>
+      <div class="text-red-500 dark:text-red-400">
+        <i class="fas fa-ban text-2xl"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+  <!-- Top Blocked IPs -->
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+    <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+      <i class="fas fa-ban mr-2 text-red-500"></i>Top Blocked IPs (24h)
+    </h3>
+    {% if top_blocked_ips %}
+      <div class="space-y-3">
+        {% for ip in top_blocked_ips %}
+          <div class="flex justify-between items-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+            <span class="font-mono text-sm text-gray-900 dark:text-white">{{ ip.remote_ip }}</span>
+            <span class="text-sm text-red-600 dark:text-red-400 font-medium">{{ ip.count }} blocks</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-gray-500 dark:text-gray-400 text-center py-4">
+        <i class="fas fa-shield-check text-2xl mb-2 block"></i>
+        No blocks in the last 24 hours
+      </p>
+    {% endif %}
+  </div>
+
+  <!-- Top Rules -->
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+    <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+      <i class="fas fa-shield-alt mr-2 text-blue-500"></i>Top Triggered Rules (24h)
+    </h3>
+    {% if top_rules_triggered %}
+      <div class="space-y-3">
+        {% for rule in top_rules_triggered %}
+          <div class="flex justify-between items-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <span class="text-sm text-gray-900 dark:text-white">{{ rule.matched_rule__name }}</span>
+            <span class="text-sm text-blue-600 dark:text-blue-400 font-medium">{{ rule.count }} times</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-gray-500 dark:text-gray-400 text-center py-4">
+        <i class="fas fa-shield-check text-2xl mb-2 block"></i>
+        No rules triggered in the last 24 hours
+      </p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+  <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+    <i class="fas fa-bolt mr-2 text-yellow-500"></i>Quick Actions
+  </h3>
+  <div class="flex flex-wrap gap-4">
+    <a href="{% url 'sites:create' %}" 
+       class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
+              transition-colors duration-200 font-medium">
+      <i class="fas fa-plus mr-2"></i>Add Site
+    </a>
+    <a href="{% url 'rules:rule_management' %}" 
+       class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 
+              transition-colors duration-200 font-medium">
+      <i class="fas fa-shield-alt mr-2"></i>Manage Rules
+    </a>
+    <a href="{% url 'logs:list' %}" 
+       class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 
+              transition-colors duration-200 font-medium">
+      <i class="fas fa-list-alt mr-2"></i>View Logs
+    </a>
+  </div>
+</div>
+
+{% endblock %}

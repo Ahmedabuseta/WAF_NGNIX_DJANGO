@@ -1,0 +1,156 @@
+{% extends 'ui/base.html' %}
+
+{% block title %}Security Reports{% endblock %}
+
+{% block content %}
+<div class="p-6">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Security Reports</h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-2">View and manage security incident reports</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mb-6">
+        <form method="get" class="flex flex-wrap gap-4">
+            <div>
+                <label for="type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Report Type</label>
+                <select name="type" id="type" class="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                    <option value="">All Types</option>
+                    <option value="daily" {% if request.GET.type == 'daily' %}selected{% endif %}>Daily</option>
+                    <option value="weekly" {% if request.GET.type == 'weekly' %}selected{% endif %}>Weekly</option>
+                    <option value="monthly" {% if request.GET.type == 'monthly' %}selected{% endif %}>Monthly</option>
+                    <option value="incident" {% if request.GET.type == 'incident' %}selected{% endif %}>Incident</option>
+                </select>
+            </div>
+            <div>
+                <label for="severity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Severity</label>
+                <select name="severity" id="severity" class="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                    <option value="">All Severities</option>
+                    <option value="low" {% if request.GET.severity == 'low' %}selected{% endif %}>Low</option>
+                    <option value="medium" {% if request.GET.severity == 'medium' %}selected{% endif %}>Medium</option>
+                    <option value="high" {% if request.GET.severity == 'high' %}selected{% endif %}>High</option>
+                    <option value="critical" {% if request.GET.severity == 'critical' %}selected{% endif %}>Critical</option>
+                </select>
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+                    Filter
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Reports List -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+        {% if reports %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Report</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Type</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Severity</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Generated</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Period</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    {% for report in reports %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div>
+                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ report.title }}</div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400">{{ report.summary|truncatechars:100 }}</div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                {{ report.get_report_type_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                                {% if report.severity == 'critical' %}bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200
+                                {% elif report.severity == 'high' %}bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200
+                                {% elif report.severity == 'medium' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200
+                                {% else %}bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200{% endif %}">
+                                {{ report.get_severity_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            {{ report.generated_at|date:"M d, Y H:i" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            {{ report.period_start|date:"M d" }} - {{ report.period_end|date:"M d, Y" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300" onclick="viewReport({{ report.id }})">
+                                View
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6">
+            <div class="flex-1 flex justify-between sm:hidden">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
+                    Previous
+                </a>
+                {% endif %}
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
+                    Next
+                </a>
+                {% endif %}
+            </div>
+            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-sm text-gray-700 dark:text-gray-300">
+                        Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} results
+                    </p>
+                </div>
+                <div>
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                        {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
+                            Previous
+                        </a>
+                        {% endif %}
+                        {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
+                            Next
+                        </a>
+                        {% endif %}
+                    </nav>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No security reports</h3>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">No security reports found for the selected filters.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function viewReport(reportId) {
+    // Implement report viewing functionality
+    console.log('Viewing report:', reportId);
+    // You can implement a modal or redirect to detailed view
+}
+</script>
+{% endblock %}

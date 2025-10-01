@@ -1,0 +1,218 @@
+<!-- Toast Notification Component -->
+<div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2">
+    <!-- Toast notifications will be dynamically added here -->
+</div>
+
+<!-- Notification Toast Template -->
+<template id="toast-template">
+    <div class="max-w-sm w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden">
+        <div class="p-4">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <svg id="toast-icon" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <!-- Icon will be set dynamically -->
+                    </svg>
+                </div>
+                <div class="ml-3 w-0 flex-1 pt-0.5">
+                    <p id="toast-title" class="text-sm font-medium text-gray-900 dark:text-white"></p>
+                    <p id="toast-message" class="mt-1 text-sm text-gray-500 dark:text-gray-400"></p>
+                </div>
+                <div class="ml-4 flex-shrink-0 flex">
+                    <button id="toast-close" class="bg-white dark:bg-gray-800 rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <span class="sr-only">Close</span>
+                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- Notification Types -->
+<script>
+class NotificationManager {
+    constructor() {
+        this.container = document.getElementById('toast-container');
+        this.template = document.getElementById('toast-template');
+        this.notifications = new Map();
+    }
+
+    show(type, title, message, duration = 5000) {
+        const id = Date.now().toString();
+        const toast = this.createToast(id, type, title, message);
+        
+        this.container.appendChild(toast);
+        this.notifications.set(id, toast);
+
+        // Auto remove after duration
+        if (duration > 0) {
+            setTimeout(() => this.remove(id), duration);
+        }
+
+        return id;
+    }
+
+    createToast(id, type, title, message) {
+        const clone = this.template.content.cloneNode(true);
+        const toast = clone.querySelector('div');
+        const icon = clone.querySelector('#toast-icon');
+        const titleEl = clone.querySelector('#toast-title');
+        const messageEl = clone.querySelector('#toast-message');
+        const closeBtn = clone.querySelector('#toast-close');
+
+        // Set content
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+
+        // Set icon and colors based on type
+        const config = this.getTypeConfig(type);
+        icon.innerHTML = config.icon;
+        icon.className = `h-6 w-6 ${config.iconColor}`;
+
+        // Add close functionality
+        closeBtn.addEventListener('click', () => this.remove(id));
+
+        // Add slide-in animation
+        toast.style.transform = 'translateX(100%)';
+        toast.style.transition = 'transform 0.3s ease-in-out';
+        
+        setTimeout(() => {
+            toast.style.transform = 'translateX(0)';
+        }, 10);
+
+        return toast;
+    }
+
+    getTypeConfig(type) {
+        const configs = {
+            success: {
+                icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+                iconColor: 'text-green-400'
+            },
+            error: {
+                icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+                iconColor: 'text-red-400'
+            },
+            warning: {
+                icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>',
+                iconColor: 'text-yellow-400'
+            },
+            info: {
+                icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+                iconColor: 'text-blue-400'
+            }
+        };
+
+        return configs[type] || configs.info;
+    }
+
+    remove(id) {
+        const toast = this.notifications.get(id);
+        if (toast) {
+            toast.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+                this.notifications.delete(id);
+            }, 300);
+        }
+    }
+
+    clear() {
+        this.notifications.forEach((toast, id) => {
+            this.remove(id);
+        });
+    }
+}
+
+// Global notification manager
+window.notifications = new NotificationManager();
+
+// Convenience functions
+window.showSuccess = (title, message, duration) => window.notifications.show('success', title, message, duration);
+window.showError = (title, message, duration) => window.notifications.show('error', title, message, duration);
+window.showWarning = (title, message, duration) => window.notifications.show('warning', title, message, duration);
+window.showInfo = (title, message, duration) => window.notifications.show('info', title, message, duration);
+</script>
+
+<!-- Real-time Notifications (WebSocket) -->
+<script>
+class RealTimeNotifications {
+    constructor() {
+        this.ws = null;
+        this.reconnectInterval = 5000;
+        this.maxReconnectAttempts = 5;
+        this.reconnectAttempts = 0;
+    }
+
+    connect() {
+        try {
+            // WebSocket connection for real-time notifications
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws/notifications/`;
+            
+            this.ws = new WebSocket(wsUrl);
+            
+            this.ws.onopen = () => {
+                console.log('WebSocket connected');
+                this.reconnectAttempts = 0;
+            };
+            
+            this.ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                this.handleNotification(data);
+            };
+            
+            this.ws.onclose = () => {
+                console.log('WebSocket disconnected');
+                this.reconnect();
+            };
+            
+            this.ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+            
+        } catch (error) {
+            console.error('Failed to connect to WebSocket:', error);
+            this.reconnect();
+        }
+    }
+
+    reconnect() {
+        if (this.reconnectAttempts < this.maxReconnectAttempts) {
+            this.reconnectAttempts++;
+            console.log(`Attempting to reconnect... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+            
+            setTimeout(() => {
+                this.connect();
+            }, this.reconnectInterval);
+        } else {
+            console.error('Max reconnection attempts reached');
+        }
+    }
+
+    handleNotification(data) {
+        const { type, title, message, duration } = data;
+        window.notifications.show(type, title, message, duration);
+    }
+
+    disconnect() {
+        if (this.ws) {
+            this.ws.close();
+            this.ws = null;
+        }
+    }
+}
+
+// Initialize real-time notifications
+document.addEventListener('DOMContentLoaded', function() {
+    // Only connect if user is authenticated
+    if (document.body.dataset.userAuthenticated === 'true') {
+        window.realTimeNotifications = new RealTimeNotifications();
+        window.realTimeNotifications.connect();
+    }
+});
+</script>

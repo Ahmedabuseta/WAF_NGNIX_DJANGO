@@ -1,0 +1,73 @@
+# Caddy L7 Proxy Configuration for WAF Application
+# This handles SSL termination and external authentication
+
+{
+    # Global options
+    auto_https off
+    admin localhost:2019
+}
+
+# Main WAF application
+localhost:80 {
+    # Reverse proxy to Django application
+    reverse_proxy django:8000 {
+        header_up Host {host}
+        header_up X-Real-IP {remote}
+        header_up X-Forwarded-For {remote}
+        header_up X-Forwarded-Proto {scheme}
+    }
+    
+    # Security headers
+    header {
+        # Security headers
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        
+        # Remove server information
+        -Server
+    }
+    
+    # Logging
+    log {
+        output file /var/log/caddy/access.log
+        format json
+    }
+}
+
+# Kibana proxy
+kibana.localhost:80 {
+    reverse_proxy kibana:5601 {
+        header_up Host {host}
+        header_up X-Real-IP {remote}
+        header_up X-Forwarded-For {remote}
+        header_up X-Forwarded-Proto {scheme}
+    }
+    
+    # Kibana-specific headers
+    header {
+        X-Frame-Options "SAMEORIGIN"
+    }
+}
+
+# Grafana proxy
+grafana.localhost:80 {
+    reverse_proxy grafana:3000 {
+        header_up Host {host}
+        header_up X-Real-IP {remote}
+        header_up X-Forwarded-For {remote}
+        header_up X-Forwarded-Proto {scheme}
+    }
+}
+
+# Prometheus proxy
+prometheus.localhost:80 {
+    reverse_proxy prometheus:9090 {
+        header_up Host {host}
+        header_up X-Real-IP {remote}
+        header_up X-Forwarded-For {remote}
+        header_up X-Forwarded-Proto {scheme}
+    }
+}

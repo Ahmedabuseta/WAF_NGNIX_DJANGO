@@ -1,0 +1,23 @@
+# Kibana Configuration for WAF Application
+# Minimal configuration compatible with Kibana 8.11.0
+
+# Server Configuration
+server.name: "waf-kibana"
+server.host: "0.0.0.0"
+server.port: 5601
+
+# Elasticsearch Configuration
+elasticsearch.hosts: ["http://elasticsearch:9200"]
+elasticsearch.requestTimeout: 30000
+elasticsearch.shardTimeout: 30000
+elasticsearch.pingTimeout: 30000
+
+# Security Configuration
+xpack.security.enabled: false
+
+# Monitoring
+monitoring.ui.container.elasticsearch.enabled: true
+
+# Advanced Settings
+telemetry.enabled: false
+telemetry.allowChangingOptInStatus: false

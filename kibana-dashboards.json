@@ -1,0 +1,53 @@
+{
+  "version": "8.11.0",
+  "objects": [
+    {
+      "id": "waf-security-dashboard",
+      "type": "dashboard",
+      "attributes": {
+        "title": "WAF Security Dashboard",
+        "description": "Real-time WAF security monitoring and threat analysis",
+        "panelsJSON": "[{\"version\":\"8.11.0\",\"gridData\":{\"x\":0,\"y\":0,\"w\":12,\"h\":8,\"i\":\"1\"},\"panelIndex\":\"1\",\"embeddableConfig\":{\"title\":\"Threat Level Distribution\",\"vis\":{\"title\":\"Threat Level Distribution\",\"type\":\"pie\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"threat_level\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}]}},\"panelRefName\":\"panel_1\"},{\"version\":\"8.11.0\",\"gridData\":{\"x\":12,\"y\":0,\"w\":12,\"h\":8,\"i\":\"2\"},\"panelIndex\":\"2\",\"embeddableConfig\":{\"title\":\"Requests Over Time\",\"vis\":{\"title\":\"Requests Over Time\",\"type\":\"histogram\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}]}},\"panelRefName\":\"panel_2\"},{\"version\":\"8.11.0\",\"gridData\":{\"x\":0,\"y\":8,\"w\":8,\"h\":6,\"i\":\"3\"},\"panelIndex\":\"3\",\"embeddableConfig\":{\"title\":\"Top Blocked IPs\",\"vis\":{\"title\":\"Top Blocked IPs\",\"type\":\"table\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"client_ip\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\"}}]}},\"panelRefName\":\"panel_3\"},{\"version\":\"8.11.0\",\"gridData\":{\"x\":8,\"y\":8,\"w\":8,\"h\":6,\"i\":\"4\"},\"panelIndex\":\"4\",\"embeddableConfig\":{\"title\":\"Response Status Codes\",\"vis\":{\"title\":\"Response Status Codes\",\"type\":\"pie\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"response_status\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}]}},\"panelRefName\":\"panel_4\"},{\"version\":\"8.11.0\",\"gridData\":{\"x\":16,\"y\":8,\"w\":8,\"h\":6,\"i\":\"5\"},\"panelIndex\":\"5\",\"embeddableConfig\":{\"title\":\"Top Attack Patterns\",\"vis\":{\"title\":\"Top Attack Patterns\",\"type\":\"table\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"rule_matched\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\"}}]}},\"panelRefName\":\"panel_5\"}]",
+        "optionsJSON": "{\"useMargins\":true,\"syncColors\":false,\"hidePanelTitles\":false}",
+        "version": 1,
+        "timeRestore": false,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"
+        }
+      }
+    },
+    {
+      "id": "waf-performance-dashboard",
+      "type": "dashboard",
+      "attributes": {
+        "title": "WAF Performance Dashboard",
+        "description": "WAF performance metrics and response time analysis",
+        "panelsJSON": "[{\"version\":\"8.11.0\",\"gridData\":{\"x\":0,\"y\":0,\"w\":12,\"h\":8,\"i\":\"1\"},\"panelIndex\":\"1\",\"embeddableConfig\":{\"title\":\"Response Time Trend\",\"vis\":{\"title\":\"Response Time Trend\",\"type\":\"line\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"response_time\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}]}},\"panelRefName\":\"panel_1\"},{\"version\":\"8.11.0\",\"gridData\":{\"x\":12,\"y\":0,\"w\":12,\"h\":8,\"i\":\"2\"},\"panelIndex\":\"2\",\"embeddableConfig\":{\"title\":\"Request Volume\",\"vis\":{\"title\":\"Request Volume\",\"type\":\"histogram\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}]}},\"panelRefName\":\"panel_2\"},{\"version\":\"8.11.0\",\"gridData\":{\"x\":0,\"y\":8,\"w\":8,\"h\":6,\"i\":\"3\"},\"panelIndex\":\"3\",\"embeddableConfig\":{\"title\":\"Average Response Time\",\"vis\":{\"title\":\"Average Response Time\",\"type\":\"metric\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"response_time\"}}]}},\"panelRefName\":\"panel_3\"},{\"version\":\"8.11.0\",\"gridData\":{\"x\":8,\"y\":8,\"w\":8,\"h\":6,\"i\":\"4\"},\"panelIndex\":\"4\",\"embeddableConfig\":{\"title\":\"Total Requests\",\"vis\":{\"title\":\"Total Requests\",\"type\":\"metric\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}}]}},\"panelRefName\":\"panel_4\"},{\"version\":\"8.11.0\",\"gridData\":{\"x\":16,\"y\":8,\"w\":8,\"h\":6,\"i\":\"5\"},\"panelIndex\":\"5\",\"embeddableConfig\":{\"title\":\"Blocked Requests\",\"vis\":{\"title\":\"Blocked Requests\",\"type\":\"metric\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"filters\",\"schema\":\"group\",\"params\":{\"filters\":[{\"input\":{\"query\":{\"query_string\":{\"query\":\"response_status:403\",\"analyze_wildcard\":true}}},\"label\":\"Blocked\"}]}}]}},\"panelRefName\":\"panel_5\"}]",
+        "optionsJSON": "{\"useMargins\":true,\"syncColors\":false,\"hidePanelTitles\":false}",
+        "version": 1,
+        "timeRestore": false,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"
+        }
+      }
+    },
+    {
+      "id": "waf-logs-index-pattern",
+      "type": "index-pattern",
+      "attributes": {
+        "title": "waf-logs-*",
+        "timeFieldName": "@timestamp",
+        "fields": "[{\"name\":\"@timestamp\",\"type\":\"date\",\"esTypes\":[\"date\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"client_ip\",\"type\":\"ip\",\"esTypes\":[\"ip\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"request_method\",\"type\":\"string\",\"esTypes\":[\"keyword\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"request_uri\",\"type\":\"string\",\"esTypes\":[\"keyword\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"response_status\",\"type\":\"number\",\"esTypes\":[\"integer\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"rule_matched\",\"type\":\"string\",\"esTypes\":[\"keyword\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"threat_level\",\"type\":\"string\",\"esTypes\":[\"keyword\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"site_id\",\"type\":\"string\",\"esTypes\":[\"keyword\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"user_agent\",\"type\":\"string\",\"esTypes\":[\"text\"],\"searchable\":true,\"aggregatable\":false,\"readFromDocValues\":false},{\"name\":\"response_time\",\"type\":\"number\",\"esTypes\":[\"float\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true}]"
+      }
+    },
+    {
+      "id": "waf-analytics-index-pattern",
+      "type": "index-pattern",
+      "attributes": {
+        "title": "waf-analytics-*",
+        "timeFieldName": "@timestamp",
+        "fields": "[{\"name\":\"@timestamp\",\"type\":\"date\",\"esTypes\":[\"date\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"site_id\",\"type\":\"string\",\"esTypes\":[\"keyword\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"total_requests\",\"type\":\"number\",\"esTypes\":[\"long\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"blocked_requests\",\"type\":\"number\",\"esTypes\":[\"long\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"response_time_avg\",\"type\":\"number\",\"esTypes\":[\"float\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"top_threats\",\"type\":\"string\",\"esTypes\":[\"keyword\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"geo_location\",\"type\":\"geo_point\",\"esTypes\":[\"geo_point\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true}]"
+      }
+    }
+  ]
+}

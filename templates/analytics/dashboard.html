@@ -1,0 +1,301 @@
+{% extends 'ui/base.html' %}
+{% load static %}
+
+{% block title %}Analytics Dashboard{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+{% endblock %}
+
+{% block content %}
+<div class="p-6">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Analytics Dashboard</h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-2">Monitor your WAF performance and security metrics</p>
+    </div>
+
+    <!-- Key Metrics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Total Requests (24h) -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium uppercase">Total Requests (24h)</h3>
+                    <p class="text-3xl font-bold text-gray-900 dark:text-white mt-1">{{ total_requests_24h|default:0 }}</p>
+                </div>
+                <div class="text-blue-500 dark:text-blue-400">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blocked Requests (24h) -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium uppercase">Blocked Requests (24h)</h3>
+                    <p class="text-3xl font-bold text-red-600 dark:text-red-400 mt-1">{{ blocked_requests_24h|default:0 }}</p>
+                </div>
+                <div class="text-red-500 dark:text-red-400">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Block Rate (24h) -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium uppercase">Block Rate (24h)</h3>
+                    <p class="text-3xl font-bold text-orange-600 dark:text-orange-400 mt-1">{{ block_rate_24h|floatformat:1 }}%</p>
+                </div>
+                <div class="text-orange-500 dark:text-orange-400">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Threats -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium uppercase">Active Threats</h3>
+                    <p class="text-3xl font-bold text-purple-600 dark:text-purple-400 mt-1">{{ active_threats|default:0 }}</p>
+                </div>
+                <div class="text-purple-500 dark:text-purple-400">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Traffic Timeline Chart -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Traffic Timeline (24h)</h3>
+            <canvas id="trafficChart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- Geographic Distribution -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Geographic Distribution</h3>
+            <div id="geoMap" style="height: 300px;"></div>
+        </div>
+    </div>
+
+    <!-- Performance Metrics -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Response Time Chart -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Response Time Metrics</h3>
+            <canvas id="responseTimeChart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- System Resources -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">System Resources</h3>
+            <div class="space-y-4">
+                <div>
+                    <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
+                        <span>CPU Usage</span>
+                        <span>{{ cpu_usage|default:0 }}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div class="bg-blue-600 h-2 rounded-full" style="width: {{ cpu_usage|default:0 }}%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
+                        <span>Memory Usage</span>
+                        <span>{{ memory_usage|default:0 }}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div class="bg-green-600 h-2 rounded-full" style="width: {{ memory_usage|default:0 }}%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
+                        <span>Error Rate</span>
+                        <span>{{ error_rate|default:0 }}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div class="bg-red-600 h-2 rounded-full" style="width: {{ error_rate|default:0 }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Lists -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Top Blocked IPs -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Top Blocked IPs (24h)</h3>
+            <div class="space-y-2">
+                {% for ip in top_blocked_ips %}
+                <div class="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+                    <span class="font-mono text-sm">{{ ip.remote_ip }}</span>
+                    <span class="text-red-600 dark:text-red-400 font-semibold">{{ ip.count }}</span>
+                </div>
+                {% empty %}
+                <p class="text-gray-500 dark:text-gray-400 text-center py-4">No blocked IPs in the last 24 hours</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Top Triggered Rules -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Top Triggered Rules (24h)</h3>
+            <div class="space-y-2">
+                {% for rule in top_rules %}
+                <div class="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+                    <span class="text-sm">{{ rule.matched_rule__name }}</span>
+                    <span class="text-orange-600 dark:text-orange-400 font-semibold">{{ rule.count }}</span>
+                </div>
+                {% empty %}
+                <p class="text-gray-500 dark:text-gray-400 text-center py-4">No rules triggered in the last 24 hours</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Traffic Timeline Chart
+const trafficCtx = document.getElementById('trafficChart').getContext('2d');
+const trafficChart = new Chart(trafficCtx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Total Requests',
+            data: [],
+            borderColor: 'rgb(59, 130, 246)',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            tension: 0.1
+        }, {
+            label: 'Blocked Requests',
+            data: [],
+            borderColor: 'rgb(239, 68, 68)',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// Response Time Chart
+const responseCtx = document.getElementById('responseTimeChart').getContext('2d');
+const responseChart = new Chart(responseCtx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Average Response Time (ms)',
+            data: [],
+            borderColor: 'rgb(16, 185, 129)',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// Load data from API
+async function loadAnalyticsData() {
+    try {
+        // Load traffic timeline
+        const trafficResponse = await fetch('/analytics/api/traffic_timeline/?hours=24');
+        const trafficData = await trafficResponse.json();
+        
+        if (trafficData.data) {
+            trafficChart.data.labels = trafficData.data.map(d => new Date(d.timestamp).toLocaleTimeString());
+            trafficChart.data.datasets[0].data = trafficData.data.map(d => d.total);
+            trafficChart.data.datasets[1].data = trafficData.data.map(d => d.blocked);
+            trafficChart.update();
+        }
+        
+        // Load performance metrics
+        const perfResponse = await fetch('/analytics/api/performance_metrics/?hours=24');
+        const perfData = await perfResponse.json();
+        
+        if (perfData.data && perfData.data.length > 0) {
+            responseChart.data.labels = perfData.data.map(d => new Date(d.timestamp).toLocaleTimeString());
+            responseChart.data.datasets[0].data = perfData.data.map(d => d.response_time_avg);
+            responseChart.update();
+        }
+        
+    } catch (error) {
+        console.error('Error loading analytics data:', error);
+    }
+}
+
+// Initialize map
+const map = L.map('geoMap').setView([20, 0], 2);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+// Load geographic data
+async function loadGeographicData() {
+    try {
+        const response = await fetch('/analytics/api/geographic_data/?hours=24');
+        const data = await response.json();
+        
+        if (data.data) {
+            data.data.forEach(location => {
+                if (location.latitude && location.longitude) {
+                    L.circleMarker([location.latitude, location.longitude], {
+                        radius: Math.max(5, Math.min(20, location.request_count / 10)),
+                        fillColor: location.threat_count > 0 ? '#ef4444' : '#3b82f6',
+                        color: '#000',
+                        weight: 1,
+                        opacity: 1,
+                        fillOpacity: 0.8
+                    }).addTo(map).bindPopup(`
+                        <strong>${location.country_name}</strong><br>
+                        Requests: ${location.request_count}<br>
+                        Blocked: ${location.blocked_count}<br>
+                        Threats: ${location.threat_count}
+                    `);
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error loading geographic data:', error);
+    }
+}
+
+// Load data on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadAnalyticsData();
+    loadGeographicData();
+    
+    // Refresh data every 5 minutes
+    setInterval(loadAnalyticsData, 300000);
+});
+</script>
+{% endblock %}

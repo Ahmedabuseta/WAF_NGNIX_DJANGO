@@ -1,0 +1,72 @@
+<!-- Primary Button -->
+{% if button_type == 'primary' %}
+<button type="{{ type|default:'button' }}" 
+        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed {{ class }}">
+    {% if icon %}
+    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {{ icon|safe }}
+    </svg>
+    {% endif %}
+    {{ text }}
+</button>
+
+<!-- Secondary Button -->
+{% elif button_type == 'secondary' %}
+<button type="{{ type|default:'button' }}" 
+        class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed {{ class }}">
+    {% if icon %}
+    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {{ icon|safe }}
+    </svg>
+    {% endif %}
+    {{ text }}
+</button>
+
+<!-- Danger Button -->
+{% elif button_type == 'danger' %}
+<button type="{{ type|default:'button' }}" 
+        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed {{ class }}">
+    {% if icon %}
+    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {{ icon|safe }}
+    </svg>
+    {% endif %}
+    {{ text }}
+</button>
+
+<!-- Success Button -->
+{% elif button_type == 'success' %}
+<button type="{{ type|default:'button' }}" 
+        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed {{ class }}">
+    {% if icon %}
+    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {{ icon|safe }}
+    </svg>
+    {% endif %}
+    {{ text }}
+</button>
+
+<!-- Link Button -->
+{% elif button_type == 'link' %}
+<button type="{{ type|default:'button' }}" 
+        class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 focus:outline-none focus:underline disabled:opacity-50 disabled:cursor-not-allowed {{ class }}">
+    {% if icon %}
+    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {{ icon|safe }}
+    </svg>
+    {% endif %}
+    {{ text }}
+</button>
+
+<!-- Default Button -->
+{% else %}
+<button type="{{ type|default:'button' }}" 
+        class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed {{ class }}">
+    {% if icon %}
+    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {{ icon|safe }}
+    </svg>
+    {% endif %}
+    {{ text }}
+</button>
+{% endif %}

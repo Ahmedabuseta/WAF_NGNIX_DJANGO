@@ -1,0 +1,379 @@
+{
+  "apps": {
+    "http": {
+      "servers": {
+        "srv0": {
+          "listen": [
+            ":443"
+          ],
+          "routes": [
+            {
+              "match": [
+                {
+                  "host": [
+                    "example.com"
+                  ]
+                }
+              ],
+              "handle": [
+                {
+                  "handler": "subroute",
+                  "routes": [
+                    {
+                      "handle": [
+                        {
+                          "handler": "reverse_proxy",
+                          "upstreams": [
+                            {
+                              "dial": "http://django:8000/waf/waf/decision/"
+                            }
+                          ],
+                          "headers": {
+                            "request": {
+                              "set": {
+                                "X-Site-ID": [
+                                  "1"
+                                ],
+                                "X-Tenant-ID": [
+                                  "2"
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "handler": "reverse_proxy",
+                  "upstreams": [
+                    {
+                      "dial": "localhost:8080"
+                    }
+                  ],
+                  "headers": {
+                    "request": {
+                      "set": {
+                        "X-Original-Host": [
+                          "example.com"
+                        ],
+                        "X-Target-IP": [
+                          "192.168.1.100"
+                        ],
+                        "X-Target-Port": [
+                          "80"
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "match": [
+                {
+                  "host": [
+                    "test.waf.local"
+                  ]
+                }
+              ],
+              "handle": [
+                {
+                  "handler": "subroute",
+                  "routes": [
+                    {
+                      "handle": [
+                        {
+                          "handler": "reverse_proxy",
+                          "upstreams": [
+                            {
+                              "dial": "http://django:8000/waf/waf/decision/"
+                            }
+                          ],
+                          "headers": {
+                            "request": {
+                              "set": {
+                                "X-Site-ID": [
+                                  "4"
+                                ],
+                                "X-Tenant-ID": [
+                                  "3"
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "handler": "reverse_proxy",
+                  "upstreams": [
+                    {
+                      "dial": "localhost:8080"
+                    }
+                  ],
+                  "headers": {
+                    "request": {
+                      "set": {
+                        "X-Original-Host": [
+                          "test.waf.local"
+                        ],
+                        "X-Target-IP": [
+                          "192.168.1.100"
+                        ],
+                        "X-Target-Port": [
+                          "8080"
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "match": [
+                {
+                  "host": [
+                    "test.lockbnhyh"
+                  ]
+                }
+              ],
+              "handle": [
+                {
+                  "handler": "subroute",
+                  "routes": [
+                    {
+                      "handle": [
+                        {
+                          "handler": "reverse_proxy",
+                          "upstreams": [
+                            {
+                              "dial": "http://django:8000/waf/waf/decision/"
+                            }
+                          ],
+                          "headers": {
+                            "request": {
+                              "set": {
+                                "X-Site-ID": [
+                                  "2"
+                                ],
+                                "X-Tenant-ID": [
+                                  "3"
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "handler": "reverse_proxy",
+                  "upstreams": [
+                    {
+                      "dial": "localhost:8080"
+                    }
+                  ],
+                  "headers": {
+                    "request": {
+                      "set": {
+                        "X-Original-Host": [
+                          "test.lockbnhyh"
+                        ],
+                        "X-Target-IP": [
+                          "127.0.0.1"
+                        ],
+                        "X-Target-Port": [
+                          "3000"
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "match": [
+                {
+                  "host": [
+                    "test.lock"
+                  ]
+                }
+              ],
+              "handle": [
+                {
+                  "handler": "subroute",
+                  "routes": [
+                    {
+                      "handle": [
+                        {
+                          "handler": "reverse_proxy",
+                          "upstreams": [
+                            {
+                              "dial": "http://django:8000/waf/waf/decision/"
+                            }
+                          ],
+                          "headers": {
+                            "request": {
+                              "set": {
+                                "X-Site-ID": [
+                                  "3"
+                                ],
+                                "X-Tenant-ID": [
+                                  "3"
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "handler": "reverse_proxy",
+                  "upstreams": [
+                    {
+                      "dial": "localhost:8080"
+                    }
+                  ],
+                  "headers": {
+                    "request": {
+                      "set": {
+                        "X-Original-Host": [
+                          "test.lock"
+                        ],
+                        "X-Target-IP": [
+                          "127.0.0.1"
+                        ],
+                        "X-Target-Port": [
+                          "3000"
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "layer4": {
+      "servers": {
+        "tcp_forwarder": {
+          "listen": [
+            ":80"
+          ],
+          "routes": [
+            {
+              "match": [
+                {
+                  "tls": {
+                    "sni": [
+                      "example.com"
+                    ]
+                  }
+                }
+              ],
+              "handle": [
+                {
+                  "handler": "proxy",
+                  "upstreams": [
+                    {
+                      "dial": "192.168.1.100:80"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "match": [
+                {
+                  "tls": {
+                    "sni": [
+                      "test.waf.local"
+                    ]
+                  }
+                }
+              ],
+              "handle": [
+                {
+                  "handler": "proxy",
+                  "upstreams": [
+                    {
+                      "dial": "192.168.1.100:8080"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "match": [
+                {
+                  "tls": {
+                    "sni": [
+                      "test.lockbnhyh"
+                    ]
+                  }
+                }
+              ],
+              "handle": [
+                {
+                  "handler": "proxy",
+                  "upstreams": [
+                    {
+                      "dial": "127.0.0.1:3000"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "match": [
+                {
+                  "tls": {
+                    "sni": [
+                      "test.lock"
+                    ]
+                  }
+                }
+              ],
+              "handle": [
+                {
+                  "handler": "proxy",
+                  "upstreams": [
+                    {
+                      "dial": "127.0.0.1:3000"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "tls": {
+      "automation": {
+        "policies": [
+          {
+            "subjects": [
+              "*.waf.local"
+            ],
+            "issuers": [
+              {
+                "module": "acme",
+                "ca": "https://acme-staging-v02.api.letsencrypt.org/directory"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

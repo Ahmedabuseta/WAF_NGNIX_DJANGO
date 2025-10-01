@@ -1,0 +1,61 @@
+{% extends 'ui/base.html' %}
+
+{% block page_title %}Edit Rule{% endblock %}
+
+{% block content %}
+<div class="bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 sm:rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            <i class="fas fa-shield-alt text-purple-500 mr-2"></i>Edit Rule Configuration
+          </h3>
+        </div>
+        <form method="post" class="p-6">
+          {% csrf_token %}
+          
+          <div class="space-y-6">
+            <div>
+              <label for="{{ form.enabled.id_for_label }}" class="flex items-center">
+                {{ form.enabled }}
+                <span class="ml-2 text-sm font-medium text-gray-700">Enable this rule</span>
+              </label>
+              {% if form.enabled.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.enabled.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <div>
+              <label for="{{ form.priority.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Priority</label>
+              {{ form.priority }}
+              {% if form.priority.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.priority.errors.0 }}</p>
+              {% endif %}
+              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Lower numbers = higher priority (1-1000)</p>
+            </div>
+
+            <div>
+              <label for="{{ form.custom_pattern.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Custom Pattern (Optional)</label>
+              {{ form.custom_pattern }}
+              {% if form.custom_pattern.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.custom_pattern.errors.0 }}</p>
+              {% endif %}
+              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Override the default pattern for this site. Leave empty to use the default pattern.</p>
+            </div>
+
+            <!-- Show default pattern -->
+            <div class="bg-gray-50 dark:bg-gray-700/40 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+              <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Default Pattern</h4>
+              <code class="text-sm text-gray-900 dark:text-white">{{ object.rule.pattern }}</code>
+            </div>
+          </div>
+
+          <div class="mt-6 flex justify-end space-x-3">
+            <a href="{% url 'rules:rule_management' %}" class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
+              Cancel
+            </a>
+            <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+              Update Rule
+            </button>
+          </div>
+        </form>
+      </div>
+{% endblock %}

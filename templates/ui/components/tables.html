@@ -1,0 +1,146 @@
+<!-- Data Table Component -->
+<div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+    {% if title %}
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ title }}</h3>
+        {% if subtitle %}
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ subtitle }}</p>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% if searchable %}
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <div class="max-w-md">
+            {% include 'ui/components/forms.html' with name='search' placeholder='Search...' %}
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if filterable %}
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex flex-wrap gap-4">
+            {% for filter in filters %}
+            <div class="min-w-0 flex-1">
+                {% include 'ui/components/forms.html' with name=filter.name choices=filter.choices placeholder=filter.placeholder %}
+            </div>
+            {% endfor %}
+            <div class="flex-shrink-0">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                    Filter
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                    {% for header in headers %}
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        {{ header.name }}
+                        {% if header.sortable %}
+                        <button class="ml-1 text-gray-400 hover:text-gray-500">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                            </svg>
+                        </button>
+                        {% endif %}
+                    </th>
+                    {% endfor %}
+                    {% if actions %}
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                {% for row in rows %}
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    {% for cell in row.cells %}
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                        {{ cell|safe }}
+                    </td>
+                    {% endfor %}
+                    {% if actions %}
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div class="flex justify-end space-x-2">
+                            {% for action in actions %}
+                            <a href="{{ action.url }}" 
+                               class="text-{{ action.color|default:'blue' }}-600 hover:text-{{ action.color|default:'blue' }}-900 dark:text-{{ action.color|default:'blue' }}-400 dark:hover:text-{{ action.color|default:'blue' }}-300">
+                                {{ action.name }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{{ headers|length|add:actions|yesno:'1,0' }}" class="px-6 py-12 text-center text-sm text-gray-500 dark:text-gray-400">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No data</h3>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ empty_message|default:'No data available.' }}</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    {% if paginated and page_obj %}
+    <div class="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6">
+        <div class="flex-1 flex justify-between sm:hidden">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
+                Previous
+            </a>
+            {% endif %}
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
+                Next
+            </a>
+            {% endif %}
+        </div>
+        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm text-gray-700 dark:text-gray-300">
+                    Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} results
+                </p>
+            </div>
+            <div>
+                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                    {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
+                        Previous
+                    </a>
+                    {% endif %}
+                    {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
+                        Next
+                    </a>
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Status Badge Component -->
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+    {% if status == 'active' or status == 'success' %}bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
+    {% elif status == 'inactive' or status == 'error' or status == 'danger' %}bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200
+    {% elif status == 'warning' or status == 'pending' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200
+    {% elif status == 'info' %}bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200
+    {% else %}bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200{% endif %}">
+    {{ text }}
+</span>
+
+<!-- Progress Bar Component -->
+<div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+    <div class="bg-{{ color|default:'blue' }}-600 h-2 rounded-full transition-all duration-300" style="width: {{ percentage }}%"></div>
+</div>

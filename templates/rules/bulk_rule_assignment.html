@@ -1,0 +1,151 @@
+{% extends 'ui/base.html' %}
+
+{% block title %}Bulk Rule Assignment - WAF Dashboard{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <!-- Header -->
+    <div class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Bulk Rule Assignment</h1>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Assign multiple rules to multiple sites at once
+                    </p>
+                </div>
+                <a href="{% url 'rules:rule_management' %}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Back to Rules
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">
+                        Select Sites and Rules
+                    </h3>
+                    
+                    <!-- Sites Selection -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                            Select Sites
+                        </label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-48 overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                            {% for site in form.sites %}
+                                <div class="flex items-center">
+                                    {{ site.tag }}
+                                    <label for="{{ site.id_for_label }}" class="ml-2 text-sm text-gray-900 dark:text-white">
+                                        {{ site.choice_label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if form.sites.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.sites.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Rules Selection -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                            Select Rules
+                        </label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-48 overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                            {% for rule in form.rules %}
+                                <div class="flex items-start">
+                                    {{ rule.tag }}
+                                    <div class="ml-2">
+                                        <label for="{{ rule.id_for_label }}" class="text-sm font-medium text-gray-900 dark:text-white">
+                                            {{ rule.choice_label }}
+                                        </label>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                            {{ rule.choice_value.description|truncatechars:100 }}
+                                        </p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if form.rules.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.rules.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Configuration -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="{{ form.enabled.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                {{ form.enabled.label }}
+                            </label>
+                            <div class="flex items-center">
+                                {{ form.enabled }}
+                                <label for="{{ form.enabled.id_for_label }}" class="ml-2 text-sm text-gray-900 dark:text-white">
+                                    Enable rules by default
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="{{ form.priority.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                {{ form.priority.label }}
+                            </label>
+                            {{ form.priority }}
+                            {% if form.priority.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.priority.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 sm:px-6 flex justify-end space-x-3">
+                    <a href="{% url 'rules:rule_management' %}" 
+                       class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:hover:bg-gray-500">
+                        Cancel
+                    </a>
+                    <button type="submit" 
+                            class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Assign Rules
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Help Section -->
+        <div class="mt-6 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
+                        Bulk Assignment Tips
+                    </h3>
+                    <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
+                        <ul class="list-disc list-inside space-y-1">
+                            <li>Select multiple sites and rules to assign them all at once</li>
+                            <li>Rules will be enabled/disabled based on your selection</li>
+                            <li>Priority determines the order in which rules are evaluated (lower = higher priority)</li>
+                            <li>Existing rule assignments will be updated with new settings</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

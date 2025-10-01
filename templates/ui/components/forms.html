@@ -1,0 +1,107 @@
+<!-- Form Field Component -->
+<div class="mb-4">
+    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        {{ label }}
+        {% if required %}<span class="text-red-500">*</span>{% endif %}
+    </label>
+    
+    {% if field.field.widget.input_type == 'text' or field.field.widget.input_type == 'email' or field.field.widget.input_type == 'url' or field.field.widget.input_type == 'password' %}
+    <input type="{{ field.field.widget.input_type }}" 
+           name="{{ field.name }}" 
+           id="{{ field.id_for_label }}" 
+           value="{{ field.value|default:'' }}"
+           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white {{ field.errors|yesno:'border-red-500,,' }}"
+           placeholder="{{ placeholder|default:'' }}"
+           {% if required %}required{% endif %}>
+    
+    {% elif field.field.widget.input_type == 'number' %}
+    <input type="number" 
+           name="{{ field.name }}" 
+           id="{{ field.id_for_label }}" 
+           value="{{ field.value|default:'' }}"
+           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white {{ field.errors|yesno:'border-red-500,,' }}"
+           placeholder="{{ placeholder|default:'' }}"
+           {% if required %}required{% endif %}>
+    
+    {% elif field.field.widget.input_type == 'checkbox' %}
+    <div class="flex items-center">
+        <input type="checkbox" 
+               name="{{ field.name }}" 
+               id="{{ field.id_for_label }}" 
+               value="{{ field.value|default:'on' }}"
+               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded {{ field.errors|yesno:'border-red-500,,' }}"
+               {% if field.value %}checked{% endif %}
+               {% if required %}required{% endif %}>
+        <label for="{{ field.id_for_label }}" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+            {{ label }}
+        </label>
+    </div>
+    
+    {% elif field.field.widget.input_type == 'select' %}
+    <select name="{{ field.name }}" 
+            id="{{ field.id_for_label }}" 
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white {{ field.errors|yesno:'border-red-500,,' }}"
+            {% if required %}required{% endif %}>
+        {% for choice in field.field.choices %}
+        <option value="{{ choice.0 }}" {% if field.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+        {% endfor %}
+    </select>
+    
+    {% elif field.field.widget.input_type == 'textarea' %}
+    <textarea name="{{ field.name }}" 
+              id="{{ field.id_for_label }}" 
+              rows="{{ rows|default:3 }}"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white {{ field.errors|yesno:'border-red-500,,' }}"
+              placeholder="{{ placeholder|default:'' }}"
+              {% if required %}required{% endif %}>{{ field.value|default:'' }}</textarea>
+    
+    {% else %}
+    {{ field }}
+    {% endif %}
+    
+    {% if field.help_text %}
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ field.help_text }}</p>
+    {% endif %}
+    
+    {% if field.errors %}
+    <div class="mt-1">
+        {% for error in field.errors %}
+        <p class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Form Group Component -->
+<div class="space-y-4">
+    {% for field in form %}
+    {% include 'ui/components/forms.html' with field=field label=field.label required=field.field.required %}
+    {% endfor %}
+</div>
+
+<!-- Search Input Component -->
+<div class="relative">
+    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+    </div>
+    <input type="text" 
+           name="{{ name|default:'search' }}" 
+           id="{{ id|default:'search' }}" 
+           value="{{ value|default:'' }}"
+           class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+           placeholder="{{ placeholder|default:'Search...' }}">
+</div>
+
+<!-- Filter Dropdown Component -->
+<div class="relative">
+    <select name="{{ name|default:'filter' }}" 
+            id="{{ id|default:'filter' }}" 
+            class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+        <option value="">{{ placeholder|default:'All' }}</option>
+        {% for choice in choices %}
+        <option value="{{ choice.0 }}" {% if value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+        {% endfor %}
+    </select>
+</div>

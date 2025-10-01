@@ -1,0 +1,38 @@
+{
+  "version": "8.11.0",
+  "objects": [
+    {
+      "id": "waf-overview-dashboard",
+      "type": "dashboard",
+      "attributes": {
+        "title": "WAF Overview Dashboard",
+        "description": "Comprehensive WAF monitoring dashboard",
+        "panelsJSON": "[{\"version\":\"8.11.0\",\"gridData\":{\"x\":0,\"y\":0,\"w\":24,\"h\":15,\"i\":\"1\"},\"panelIndex\":\"1\",\"embeddableConfig\":{},\"panelRefName\":\"panel_1\"}]",
+        "optionsJSON": "{\"useMargins\":true,\"syncColors\":false,\"hidePanelTitles\":false}",
+        "version": 1,
+        "timeRestore": false,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"
+        }
+      }
+    },
+    {
+      "id": "waf-logs-index-pattern",
+      "type": "index-pattern",
+      "attributes": {
+        "title": "waf-logs-*",
+        "timeFieldName": "@timestamp",
+        "fields": "[{\"name\":\"@timestamp\",\"type\":\"date\",\"esTypes\":[\"date\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"client_ip\",\"type\":\"ip\",\"esTypes\":[\"ip\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"request_method\",\"type\":\"string\",\"esTypes\":[\"keyword\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"request_uri\",\"type\":\"string\",\"esTypes\":[\"keyword\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"response_status\",\"type\":\"number\",\"esTypes\":[\"integer\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"rule_matched\",\"type\":\"string\",\"esTypes\":[\"keyword\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"threat_level\",\"type\":\"string\",\"esTypes\":[\"keyword\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true}]"
+      }
+    },
+    {
+      "id": "waf-analytics-index-pattern",
+      "type": "index-pattern",
+      "attributes": {
+        "title": "waf-analytics-*",
+        "timeFieldName": "@timestamp",
+        "fields": "[{\"name\":\"@timestamp\",\"type\":\"date\",\"esTypes\":[\"date\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"site_id\",\"type\":\"string\",\"esTypes\":[\"keyword\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"total_requests\",\"type\":\"number\",\"esTypes\":[\"long\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"blocked_requests\",\"type\":\"number\",\"esTypes\":[\"long\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"response_time_avg\",\"type\":\"number\",\"esTypes\":[\"float\"],\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true}]"
+      }
+    }
+  ]
+}

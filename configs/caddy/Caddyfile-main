@@ -1,0 +1,119 @@
+# WAF Caddy Configuration with Dynamic Site Management
+# This configuration loads dynamic site configurations and provides comprehensive logging
+
+{
+    # Global options
+    auto_https off
+    admin localhost:2019
+    log {
+        level INFO
+        format json
+        output file /var/log/caddy/caddy.log {
+            roll_size 100mb
+            roll_keep 5
+            roll_keep_for 720h
+        }
+    }
+}
+
+# Dynamic configuration will be loaded via Admin API
+# The JSON file is for reference and will be used by Django to update Caddy
+
+# Main WAF application (always available)
+localhost:80 {
+    # Reverse proxy to Django application
+    reverse_proxy django:8000 {
+        header_up Host {host}
+        header_up X-Real-IP {remote}
+        header_up X-Forwarded-For {remote}
+        header_up X-Forwarded-Proto {scheme}
+    }
+    
+    # Security headers
+    header {
+        # Security headers
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        
+        # Remove server information
+        -Server
+    }
+    
+    # Detailed logging for WAF application
+    log {
+        output file /var/log/caddy/waf-app.log {
+            roll_size 50mb
+            roll_keep 10
+            roll_keep_for 168h
+        }
+        format json
+    }
+}
+
+# Kibana proxy
+kibana.localhost:80 {
+    reverse_proxy kibana:5601 {
+        header_up Host {host}
+        header_up X-Real-IP {remote}
+        header_up X-Forwarded-For {remote}
+        header_up X-Forwarded-Proto {scheme}
+    }
+    
+    # Kibana-specific headers
+    header {
+        X-Frame-Options "SAMEORIGIN"
+    }
+    
+    # Kibana logging
+    log {
+        output file /var/log/caddy/kibana.log {
+            roll_size 25mb
+            roll_keep 5
+            roll_keep_for 72h
+        }
+        format json
+    }
+}
+
+# Grafana proxy
+grafana.localhost:80 {
+    reverse_proxy grafana:3000 {
+        header_up Host {host}
+        header_up X-Real-IP {remote}
+        header_up X-Forwarded-For {remote}
+        header_up X-Forwarded-Proto {scheme}
+    }
+    
+    # Grafana logging
+    log {
+        output file /var/log/caddy/grafana.log {
+            roll_size 25mb
+            roll_keep 5
+            roll_keep_for 72h
+        }
+        format json
+    }
+}
+
+# Prometheus proxy
+prometheus.localhost:80 {
+    reverse_proxy prometheus:9090 {
+        header_up Host {host}
+        header_up X-Real-IP {remote}
+        header_up X-Forwarded-For {remote}
+        header_up X-Forwarded-Proto {scheme}
+    }
+    
+    # Prometheus logging
+    log {
+        output file /var/log/caddy/prometheus.log {
+            roll_size 25mb
+            roll_keep 5
+            roll_keep_for 72h
+        }
+        format json
+    }
+}

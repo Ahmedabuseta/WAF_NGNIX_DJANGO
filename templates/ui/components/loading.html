@@ -1,0 +1,159 @@
+<!-- Loading Spinner Component -->
+<div id="loading-spinner" class="fixed inset-0 z-50 flex items-center justify-center bg-white dark:bg-gray-900 bg-opacity-75 hidden">
+    <div class="flex flex-col items-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">Loading...</p>
+    </div>
+</div>
+
+<!-- Inline Loading Spinner -->
+<div class="inline-flex items-center">
+    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+    <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Loading...</span>
+</div>
+
+<!-- Button Loading State -->
+<button class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+    Loading...
+</button>
+
+<!-- Skeleton Loading Components -->
+<div class="animate-pulse">
+    <!-- Card Skeleton -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2"></div>
+                <div class="h-8 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+            </div>
+            <div class="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded"></div>
+        </div>
+    </div>
+    
+    <!-- Table Skeleton -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="h-6 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
+        </div>
+        <div class="p-6">
+            <div class="space-y-3">
+                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-4/6"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- List Skeleton -->
+    <div class="space-y-3">
+        <div class="flex items-center space-x-3">
+            <div class="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+            <div class="flex-1 space-y-2">
+                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+            </div>
+        </div>
+        <div class="flex items-center space-x-3">
+            <div class="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+            <div class="flex-1 space-y-2">
+                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Loading Manager
+class LoadingManager {
+    constructor() {
+        this.spinner = document.getElementById('loading-spinner');
+        this.loadingCount = 0;
+    }
+    
+    show() {
+        this.loadingCount++;
+        if (this.spinner) {
+            this.spinner.classList.remove('hidden');
+        }
+    }
+    
+    hide() {
+        this.loadingCount = Math.max(0, this.loadingCount - 1);
+        if (this.loadingCount === 0 && this.spinner) {
+            this.spinner.classList.add('hidden');
+        }
+    }
+    
+    reset() {
+        this.loadingCount = 0;
+        if (this.spinner) {
+            this.spinner.classList.add('hidden');
+        }
+    }
+}
+
+// Global loading manager
+window.loading = new LoadingManager();
+
+// AJAX loading interceptor
+(function() {
+    const originalFetch = window.fetch;
+    
+    window.fetch = function(...args) {
+        window.loading.show();
+        return originalFetch.apply(this, args)
+            .finally(() => window.loading.hide());
+    };
+    
+    // XMLHttpRequest interceptor
+    const originalXHR = window.XMLHttpRequest;
+    window.XMLHttpRequest = function() {
+        const xhr = new originalXHR();
+        const originalOpen = xhr.open;
+        const originalSend = xhr.send;
+        
+        xhr.open = function(...args) {
+            window.loading.show();
+            return originalOpen.apply(this, args);
+        };
+        
+        xhr.send = function(...args) {
+            xhr.addEventListener('loadend', () => window.loading.hide());
+            return originalSend.apply(this, args);
+        };
+        
+        return xhr;
+    };
+})();
+
+// Form loading states
+document.addEventListener('DOMContentLoaded', function() {
+    // Add loading state to forms
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function() {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `
+                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Processing...
+                `;
+            }
+        });
+    });
+    
+    // Add loading state to links
+    const links = document.querySelectorAll('a[href]');
+    links.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Only show loading for internal links
+            if (this.hostname === window.location.hostname) {
+                window.loading.show();
+            }
+        });
+    });
+});
+</script>

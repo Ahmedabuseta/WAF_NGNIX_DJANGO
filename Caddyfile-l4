@@ -1,0 +1,18 @@
+# Caddy L4 Proxy Configuration for WAF Application
+# This handles high-performance TCP forwarding to customer origins
+
+{
+    # Global options
+    auto_https off
+    admin localhost:2019
+}
+
+# L4 TCP forwarding service
+:8080 {
+    # TCP proxy configuration
+    # This will be dynamically configured by the Django application
+    # to forward traffic to customer origin servers
+    
+    # Default catch-all for testing
+    respond "L4 Proxy Ready" 200
+}

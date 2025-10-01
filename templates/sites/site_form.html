@@ -1,0 +1,69 @@
+{% extends 'ui/base.html' %}
+
+{% block page_title %}{% if object %}Edit{% else %}Add{% endif %} Site{% endblock %}
+
+{% block content %}
+<div class="bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 sm:rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            <i class="fas fa-globe text-blue-500 mr-2"></i>{% if object %}Edit{% else %}Add{% endif %} Site
+          </h3>
+        </div>
+        <form method="post" class="p-6">
+          {% csrf_token %}
+          
+          <div class="grid grid-cols-1 gap-6">
+            <div>
+              <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Site Name</label>
+              {{ form.name }}
+              {% if form.name.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.name.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <div>
+              <label for="{{ form.domain.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Domain</label>
+              {{ form.domain }}
+              {% if form.domain.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.domain.errors.0 }}</p>
+              {% endif %}
+              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">e.g., example.com</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="{{ form.ip.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">IP Address</label>
+                {{ form.ip }}
+                {% if form.ip.errors %}
+                  <p class="mt-1 text-sm text-red-600">{{ form.ip.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <div>
+                <label for="{{ form.port.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Port</label>
+                {{ form.port }}
+                {% if form.port.errors %}
+                  <p class="mt-1 text-sm text-red-600">{{ form.port.errors.0 }}</p>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="flex items-center">
+              {{ form.is_active }}
+              <label for="{{ form.is_active.id_for_label }}" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                Active
+              </label>
+            </div>
+          </div>
+
+          <div class="mt-6 flex justify-end space-x-3">
+            <a href="{% url 'sites:list' %}" class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
+              Cancel
+            </a>
+            <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+              {% if object %}Update{% else %}Create{% endif %} Site
+            </button>
+          </div>
+        </form>
+      </div>
+{% endblock %}
